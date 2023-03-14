@@ -244,7 +244,12 @@ class GA:
         return nextoff
     
     def clear_kratos_case_files(self):
-        pass
+        
+        fileList = glob.glob('*.txt', recursive=True)
+
+        for name in fileList:
+            os.remove(name)
+            print('delete file {}'.format(name) )
 
     def GA_main(self):
         """
@@ -305,6 +310,9 @@ class GA:
 
             #add fitness to nextoff
             nextoff = self.read_kratos_results_and_add_fitness(nextoff)
+
+            #clear old files
+            self.clear_kratos_case_files()
 
             # The population is entirely replaced by the offspring
             self.pop = nextoff
