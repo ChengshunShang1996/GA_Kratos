@@ -1,5 +1,9 @@
 import random
 from operator import itemgetter
+import os
+import shutil
+import glob
+from time import sleep
  
  
 class Gene:
@@ -145,7 +149,103 @@ class GA:
  
         crossoff.data[pos] = random.randint(bound[0][pos], bound[1][pos])
         return crossoff
- 
+    
+    def generate_kratos_cases(self, nextoff):
+
+        # creat the cases_run.sh
+        cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
+        with open(cases_run_path_and_name, "w") as f_w_cases_run:
+            f_w_cases_run.write('#!/bin/bash'+'\n')
+
+            for indiv_ in nextoff:
+
+                confining_stress = str(indiv_['Gene'].data[1])
+
+                #creat new folder
+                new_folder_name = 'Triaxial_Sigma1e5_Shear5e5_P' + str(confining_stress)
+                aim_path = os.path.join(os.getcwd(),'Generated_Triaxial_cases', new_folder_name)
+                if os.path.exists(aim_path):
+                    shutil.rmtree(aim_path)
+                os.mkdir(aim_path)
+
+                #copy source file
+                seed_file_name_list = ['decompressed_material_triaxial_test_PBM_220912.py', 'G-TriaxialDEM_FEM_boundary.mdpa', 'G-TriaxialDEM.mdpa', 'ProjectParametersDEM.json', 'MaterialsDEM.json', 'run_omp.sh']
+                for seed_file_name in seed_file_name_list:
+                    seed_file_path_and_name = os.path.join(os.getcwd(),'Triaxial_seed_files',seed_file_name)
+                    aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
+
+                    if seed_file_name == 'MaterialsDEM.json':
+                        with open(seed_file_path_and_name, "r") as f_material:
+                            with open(aim_file_path_and_name, "w") as f_material_w:
+                                for line in f_material.readlines():
+                                    f_material_w.write(line)
+                    elif seed_file_name == 'ProjectParametersDEM.json':
+                        with open(seed_file_path_and_name, "r") as f_parameter:
+                            with open(aim_file_path_and_name, "w") as f_parameter_w:
+                                for line in f_parameter.readlines():
+                                    if "ConfinementPressure" in line:
+                                        line = line.replace("0.34e6", confining_stress)
+                                    f_parameter_w.write(line)
+                    elif seed_file_name == 'run_omp.sh':
+                        with open(seed_file_path_and_name, "r") as f_run_omp:
+                            with open(aim_file_path_and_name, "w") as f_run_omp_w:
+                                for line in f_run_omp.readlines():
+                                    if "BTS-Q-Ep6.2e10-T1e3-f0.1" in line:
+                                        line = line.replace("BTS-Q-Ep6.2e10-T1e3-f0.1", new_folder_name)
+                                    f_run_omp_w.write(line)
+                    else:
+                        shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name) 
+
+                # write the cases_run.sh
+                f_w_cases_run.write('cd '+ aim_path + '\n')
+                f_w_cases_run.write('sbatch run_omp.sh' + '\n')
+
+    def run_kratos_cases(self):
+        os.popen('sh cases_run.sh')
+    
+    def read_kratos_results_and_add_fitness(self, nextoff):
+
+        xy_data_file = os.path.join(os.getcwd(),'Tensile_data.txt')
+        with open(xy_data_file, "r") as f_xy_data:
+            count = 9
+            for line in f_xy_data.readlines():
+                count += 1
+                if count % 10 == 0:
+                    values = [float(s) for s in line.split()]
+                    sigma_limit = int(values[0])
+                    shear_limit = int(values[1])
+
+                    for phi in phi_list:
+
+                        rel_error = 0.0
+
+                        for confining_stress in confining_stress_list:
+
+                            #creat new folder
+                            aim_folder_name = 'Triaxial_Sigma' + str(sigma_limit) + '_Shear' + str(shear_limit) + '_Phi' + str(phi) + '_P' + confining_stress
+                            aim_path_and_name = os.path.join(os.getcwd(),'Generated_Triaxial_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph.grf')
+
+                            triaxial_data_list = []
+                            with open(aim_path_and_name, 'r') as tensile_data:
+                                for line in tensile_data:
+                                    values = [float(s) for s in line.split()]
+                                    triaxial_data_list.append(values[1]) 
+                            
+                            if confining_stress == '0.34e6':
+                                rel_error += 100 * abs(max(triaxial_data_list) - 2.5842e6) / 2.5842e6
+                            elif confining_stress == '6.89e6':
+                                rel_error += 100 * abs(max(triaxial_data_list) - 11.9814e6) / 11.9814e6
+                            elif confining_stress == '13.79e6':
+                                rel_error += 100 * abs(max(triaxial_data_list) - 20.4294e6) / 11.9814e6
+
+                        # write BTS_peak_points.dat
+                        f_w_peak_points.write(str(sigma_limit) + ' ' + str(phi) + ' ' + str(rel_error) + '\n')
+        
+        return nextoff
+    
+    def clear_kratos_case_files(self):
+        pass
+
     def GA_main(self):
         """
         main frame work of GA
@@ -174,18 +274,38 @@ class GA:
                     if random.random() < MUTPB:  # mutate an individual with probability MUTPB
                         muteoff1 = self.mutation(crossoff1, self.bound)
                         muteoff2 = self.mutation(crossoff2, self.bound)
-                        fit_muteoff1 = self.evaluate(muteoff1.data)  # Evaluate the individuals
-                        fit_muteoff2 = self.evaluate(muteoff2.data)  # Evaluate the individuals
-                        nextoff.append({'Gene': muteoff1, 'fitness': fit_muteoff1})
-                        nextoff.append({'Gene': muteoff2, 'fitness': fit_muteoff2})
+                        #fit_muteoff1 = self.evaluate(muteoff1.data)  # Evaluate the individuals
+                        #fit_muteoff2 = self.evaluate(muteoff2.data)  # Evaluate the individuals
+                        #nextoff.append({'Gene': muteoff1, 'fitness': fit_muteoff1})
+                        #nextoff.append({'Gene': muteoff2, 'fitness': fit_muteoff2})
+                        nextoff.append({'Gene': muteoff1})
+                        nextoff.append({'Gene': muteoff2})
                     else:
                         fit_crossoff1 = self.evaluate(crossoff1.data)  # Evaluate the individuals
                         fit_crossoff2 = self.evaluate(crossoff2.data)
-                        nextoff.append({'Gene': crossoff1, 'fitness': fit_crossoff1})
-                        nextoff.append({'Gene': crossoff2, 'fitness': fit_crossoff2})
+                        #nextoff.append({'Gene': crossoff1, 'fitness': fit_crossoff1})
+                        #nextoff.append({'Gene': crossoff2, 'fitness': fit_crossoff2})
+                        nextoff.append({'Gene': crossoff1})
+                        nextoff.append({'Gene': crossoff2})
                 else:
                     nextoff.extend(offspring)
- 
+
+            #generate kratos cases according to pop 
+            self.generate_kratos_cases(nextoff)
+
+            #check whether all the kratos cases in this generation finished
+            file_num = 0
+            time_count = 0
+            while file_num != popsize:
+                file_num = len(glob.glob1(os.getcwd(),"*.txt"))
+                sleep(60)
+                print('-----Waiting for kratos cases -----')
+                time_count += 1
+                print('-------Generation {} cost {} min(s)-------'.format(g, time_count))
+
+            #add fitness to nextoff
+            nextoff = self.read_kratos_results_and_add_fitness(nextoff)
+
             # The population is entirely replaced by the offspring
             self.pop = nextoff
  
@@ -205,7 +325,7 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 100  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 20  # popsize must be even number
  
     up = [30, 30, 30, 30]  # upper range for variables
     low = [1, 1, 1, 1]  # lower range for variables
