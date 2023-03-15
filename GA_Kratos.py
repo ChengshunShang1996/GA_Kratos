@@ -53,6 +53,8 @@ class GA:
         self.pop = pop
         self.bestindividual = self.selectBest(self.pop)  # store the best chromosome in the population
         self.clear_old_and_creat_new_kratos_data_folder() # clear old and creat new kratos data folder
+        self.aim_strength = parameter[6]
+        self.aim_young_modulus = parameter[7]
  
     def evaluate(self, geneinfo):
         """
@@ -206,8 +208,6 @@ class GA:
                 cohesion_ini_bond      = str(indiv_['Gene'].data[3])
 
                 #creat new folder
-                #new_folder_name = 'G' + str(g_count) + '_Ep' + '%.2E' % Decimal(Young_mudulus_particle) + '_Eb' + '%.2E' % Decimal(Young_mudulus_bond)\
-                #               + '_Sig' + '%.2E' % Decimal(sigma_max_bond) + '_Coh' + '%.2E' % Decimal(cohesion_ini_bond)
                 new_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
                                 + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
                 aim_path = os.path.join(os.getcwd(),'Generated_kratos_cases', new_folder_name)
@@ -257,58 +257,98 @@ class GA:
     def run_kratos_cases(self):
         os.popen('sh cases_run.sh')
     
-    def read_kratos_results_and_add_fitness(self, nextoff):
-
-        xy_data_file = os.path.join(os.getcwd(),'Tensile_data.txt')
-        with open(xy_data_file, "r") as f_xy_data:
-            count = 9
-            for line in f_xy_data.readlines():
-                count += 1
-                if count % 10 == 0:
-                    values = [float(s) for s in line.split()]
-                    sigma_limit = int(values[0])
-                    shear_limit = int(values[1])
-
-                    for phi in phi_list:
-
-                        rel_error = 0.0
-
-                        for confining_stress in confining_stress_list:
-
-                            #creat new folder
-                            aim_folder_name = 'Triaxial_Sigma' + str(sigma_limit) + '_Shear' + str(shear_limit) + '_Phi' + str(phi) + '_P' + confining_stress
-                            aim_path_and_name = os.path.join(os.getcwd(),'Generated_Triaxial_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph.grf')
-
-                            triaxial_data_list = []
-                            with open(aim_path_and_name, 'r') as tensile_data:
-                                for line in tensile_data:
-                                    values = [float(s) for s in line.split()]
-                                    triaxial_data_list.append(values[1]) 
-                            
-                            if confining_stress == '0.34e6':
-                                rel_error += 100 * abs(max(triaxial_data_list) - 2.5842e6) / 2.5842e6
-                            elif confining_stress == '6.89e6':
-                                rel_error += 100 * abs(max(triaxial_data_list) - 11.9814e6) / 11.9814e6
-                            elif confining_stress == '13.79e6':
-                                rel_error += 100 * abs(max(triaxial_data_list) - 20.4294e6) / 11.9814e6
-
-                        # write BTS_peak_points.dat
-                        f_w_peak_points.write(str(sigma_limit) + ' ' + str(phi) + ' ' + str(rel_error) + '\n')
+    def read_kratos_results_and_add_fitness(self, g_count, nextoff):
         
-        return nextoff
+        for indiv_ in nextoff:
+
+            Young_mudulus_particle = str(indiv_['Gene'].data[0])
+            Young_mudulus_bond     = str(indiv_['Gene'].data[1])
+            sigma_max_bond         = str(indiv_['Gene'].data[2])
+            cohesion_ini_bond      = str(indiv_['Gene'].data[3])
+
+            #the strength files
+            aim_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
+                            + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
+            aim_path_and_name = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph.grf')
+
+            if os.path.getsize(aim_path_and_name) != 0:
+                stress_data_list = []
+                with open(aim_path_and_name, 'r') as stress_strain_data:
+                    for line in stress_strain_data:
+                        values = [float(s) for s in line.split()]
+                        stress_data_list.append(values[1]) 
+                strength_max = max(stress_data_list)
+                rel_error_strength = (strength_max - self.aim_strength)**2
+            else:
+                strength_max = 0.0
+                rel_error_strength = (self.aim_strength)**2
+
+            #the Young modulus files
+            aim_path_and_name = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph_young.grf')
+
+            if os.path.getsize(aim_path_and_name) != 0:
+                young_data_list = []
+                with open(aim_path_and_name, 'r') as young_data:
+                    for line in young_data:
+                        values = [float(s) for s in line.split()]
+                        young_data_list.append(values[1]) 
+                young_modulus_max = max(young_data_list)
+                rel_error_young_modulus = (young_modulus_max - self.aim_young_modulus)**2
+            else:
+                young_modulus_max = 0.0
+                rel_error_young_modulus = (self.aim_young_modulus)**2
+
+            if rel_error_strength + rel_error_young_modulus:
+                fitness = 1 / (rel_error_strength + rel_error_young_modulus)
+            else:
+                fitness = 0
+
+            indiv_['fitness'] = fitness
     
-    def save_and_plot_bestindividual_results(self):
+        return nextoff, strength_max, young_modulus_max
+    
+    def save_and_plot_best_individual_results(self, g_count, best_individual, strength_max, young_modulus_max):
+        
         #save data files
+        new_file_name = 'best_individual_data.dat'
+        aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', new_file_name)
+
+        with open(aim_path_and_name, "w") as f_w:
+            f_w.write(str(g_count) + ' ' + str(best_individual['Gene'].data[0])+ ' ' + str(best_individual['Gene'].data[1])+ ' ' + str(best_individual['Gene'].data[2])\
+                      + ' ' + str(best_individual['Gene'].data[3]) + ' ' + str(strength_max) + ' ' + str(young_modulus_max) + '\n')
+        f_w.close()
 
         #plot and save
-        y = [2,4,6,8,10,12,14,16,18,20]
-        x = np.arange(10)
-        fig = plt.figure()
-        ax = plt.subplot(111)
-        ax.plot(x, y, label='$y = numbers')
-        plt.title('Legend inside')
-        ax.legend()
-        fig.savefig('plot.png')
+        Young_mudulus_particle = str(best_individual['Gene'].data[0])
+        Young_mudulus_bond     = str(best_individual['Gene'].data[1])
+        sigma_max_bond         = str(best_individual['Gene'].data[2])
+        cohesion_ini_bond      = str(best_individual['Gene'].data[3])
+
+        aim_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
+                        + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
+        aim_path_and_name = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph.grf')
+
+        if os.path.getsize(aim_path_and_name) != 0:
+            strain_data_list = []
+            stress_data_list = []
+            with open(aim_path_and_name, 'r') as stress_strain_data:
+                for line in stress_strain_data:
+                    values = [float(s) for s in line.split()]
+                    strain_data_list.append(values[0]) 
+                    stress_data_list.append(values[1] * 1e-6) 
+
+            fig = plt.figure()
+            ax = plt.subplot(111)
+            ax.plot(strain_data_list, stress_data_list, label='Predicted results')
+            #plt.title('Legend inside')
+            plt.xlabel('Strain / %')  
+            plt.ylabel('Stress / MPa') 
+            ax.legend()
+            fig_name = 'Stress_strain_G' + str(g_count) + '.png'
+            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
+            fig.savefig(fig_name_and_path)
+        else:
+            print('No figure generated!')
 
     def GA_main(self):
         """
@@ -372,7 +412,7 @@ class GA:
                 print('-------Generation {} cost {} min(s)-------'.format(g, time_count))
 
             #add fitness to nextoff
-            nextoff = self.read_kratos_results_and_add_fitness(nextoff)
+            nextoff, strength_max, young_modulus_max = self.read_kratos_results_and_add_fitness(g, nextoff)
 
             # The population is entirely replaced by the offspring
             self.pop = nextoff
@@ -386,7 +426,7 @@ class GA:
                 self.bestindividual = best_ind
 
             # save the data of the best individual for post processing
-            self.save_bestindividual_results_to_results_folder()
+            self.save_and_plot_best_individual_results(g, self.bestindividual, strength_max, young_modulus_max)
  
             print("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
                                                            self.bestindividual['fitness']))
@@ -397,9 +437,10 @@ class GA:
  
 if __name__ == "__main__":
     CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 100  # popsize must be even number
+    aim_strength, aim_young_modulus = 1e6, 1e9
  
     up = [1e10, 1e10, 1e8, 1e8]  # upper range for variables
     low = [100, 100, 1, 1]  # lower range for variables
-    parameter = [CXPB, MUTPB, NGEN, popsize, low, up]
+    parameter = [CXPB, MUTPB, NGEN, popsize, low, up, aim_strength, aim_young_modulus]
     run = GA(parameter)
     run.GA_main()
