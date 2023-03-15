@@ -4,6 +4,8 @@ import os
 import shutil
 import glob
 from time import sleep
+import matplotlib.pyplot as plt
+from decimal import Decimal
  
  
 class Gene:
@@ -50,6 +52,7 @@ class GA:
  
         self.pop = pop
         self.bestindividual = self.selectBest(self.pop)  # store the best chromosome in the population
+        self.clear_old_and_creat_new_kratos_data_folder() # clear old and creat new kratos data folder
  
     def evaluate(self, geneinfo):
         """
@@ -150,41 +153,92 @@ class GA:
         crossoff.data[pos] = random.randint(bound[0][pos], bound[1][pos])
         return crossoff
     
-    def generate_kratos_cases(self, nextoff):
+    def clear_old_and_creat_new_kratos_data_folder(self):
+
+        kratos_data_folder_name = 'kratos_results_data'
+        
+        if os.path.exists(kratos_data_folder_name):
+            shutil.rmtree(kratos_data_folder_name, ignore_errors=True)
+            os.makedirs(kratos_data_folder_name)
+        else:
+            os.makedirs(kratos_data_folder_name)
+    
+    def clear_old_and_creat_new_kratos_case_folder(self):
+
+        kratos_case_folder_name = 'Generated_kratos_cases'
+
+        if os.path.exists(kratos_case_folder_name):
+            shutil.rmtree(kratos_case_folder_name, ignore_errors=True)
+            os.makedirs(kratos_case_folder_name)
+        else:
+            os.makedirs(kratos_case_folder_name)
+
+        kratos_pic_folder_name = 'kratos_results_pics'
+        aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data', kratos_pic_folder_name)
+        
+        if os.path.exists(aim_path_and_folder):
+            shutil.rmtree(aim_path_and_folder, ignore_errors=True)
+            os.makedirs(aim_path_and_folder)
+        else:
+            os.makedirs(aim_path_and_folder)
+
+        kratos_temp_data_folder_name = 'kratos_results_data_temp'
+        
+        if os.path.exists(kratos_temp_data_folder_name):
+            shutil.rmtree(kratos_temp_data_folder_name, ignore_errors=True)
+            os.makedirs(kratos_temp_data_folder_name)
+        else:
+            os.makedirs(kratos_temp_data_folder_name)
+    
+    def generate_kratos_cases(self, g_count, nextoff):
 
         # creat the cases_run.sh
         cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
         with open(cases_run_path_and_name, "w") as f_w_cases_run:
             f_w_cases_run.write('#!/bin/bash'+'\n')
 
+            #loop every individual in the pop
             for indiv_ in nextoff:
 
-                confining_stress = str(indiv_['Gene'].data[1])
+                Young_mudulus_particle = str(indiv_['Gene'].data[0])
+                Young_mudulus_bond     = str(indiv_['Gene'].data[1])
+                sigma_max_bond         = str(indiv_['Gene'].data[2])
+                cohesion_ini_bond      = str(indiv_['Gene'].data[3])
 
                 #creat new folder
-                new_folder_name = 'Triaxial_Sigma1e5_Shear5e5_P' + str(confining_stress)
-                aim_path = os.path.join(os.getcwd(),'Generated_Triaxial_cases', new_folder_name)
+                #new_folder_name = 'G' + str(g_count) + '_Ep' + '%.2E' % Decimal(Young_mudulus_particle) + '_Eb' + '%.2E' % Decimal(Young_mudulus_bond)\
+                #               + '_Sig' + '%.2E' % Decimal(sigma_max_bond) + '_Coh' + '%.2E' % Decimal(cohesion_ini_bond)
+                new_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
+                                + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
+                aim_path = os.path.join(os.getcwd(),'Generated_kratos_cases', new_folder_name)
                 if os.path.exists(aim_path):
                     shutil.rmtree(aim_path)
                 os.mkdir(aim_path)
 
                 #copy source file
-                seed_file_name_list = ['decompressed_material_triaxial_test_PBM_220912.py', 'G-TriaxialDEM_FEM_boundary.mdpa', 'G-TriaxialDEM.mdpa', 'ProjectParametersDEM.json', 'MaterialsDEM.json', 'run_omp.sh']
+                seed_file_name_list = ['decompressed_material_triaxial_test_PBM_GA_230315.py', 'G-TriaxialDEM_FEM_boundary.mdpa',\
+                                        'G-TriaxialDEM.mdpa', 'ProjectParametersDEM.json', 'MaterialsDEM.json', 'run_omp.sh']
                 for seed_file_name in seed_file_name_list:
-                    seed_file_path_and_name = os.path.join(os.getcwd(),'Triaxial_seed_files',seed_file_name)
+                    seed_file_path_and_name = os.path.join(os.getcwd(),'kratos_seed_files',seed_file_name)
                     aim_file_path_and_name = os.path.join(aim_path, seed_file_name)
 
                     if seed_file_name == 'MaterialsDEM.json':
                         with open(seed_file_path_and_name, "r") as f_material:
                             with open(aim_file_path_and_name, "w") as f_material_w:
                                 for line in f_material.readlines():
+                                    if "YOUNG_MODULUS" in line:
+                                        line = line.replace("5.0e10", str(Young_mudulus_particle))
+                                    if "BOND_YOUNG_MODULUS" in line:
+                                        line = line.replace("3.0e8", str(Young_mudulus_bond))
+                                    if "BOND_SIGMA_MAX" in line:
+                                        line = line.replace("1e5", str(sigma_max_bond))
+                                    if "BOND_TAU_ZERO" in line:
+                                        line = line.replace("5e5", str(cohesion_ini_bond))
                                     f_material_w.write(line)
                     elif seed_file_name == 'ProjectParametersDEM.json':
                         with open(seed_file_path_and_name, "r") as f_parameter:
                             with open(aim_file_path_and_name, "w") as f_parameter_w:
                                 for line in f_parameter.readlines():
-                                    if "ConfinementPressure" in line:
-                                        line = line.replace("0.34e6", confining_stress)
                                     f_parameter_w.write(line)
                     elif seed_file_name == 'run_omp.sh':
                         with open(seed_file_path_and_name, "r") as f_run_omp:
@@ -243,13 +297,18 @@ class GA:
         
         return nextoff
     
-    def clear_kratos_case_files(self):
-        
-        fileList = glob.glob('*.txt', recursive=True)
+    def save_and_plot_bestindividual_results(self):
+        #save data files
 
-        for name in fileList:
-            os.remove(name)
-            print('delete file {}'.format(name) )
+        #plot and save
+        y = [2,4,6,8,10,12,14,16,18,20]
+        x = np.arange(10)
+        fig = plt.figure()
+        ax = plt.subplot(111)
+        ax.plot(x, y, label='$y = numbers')
+        plt.title('Legend inside')
+        ax.legend()
+        fig.savefig('plot.png')
 
     def GA_main(self):
         """
@@ -262,6 +321,9 @@ class GA:
         # Begin the evolution
         for g in range(NGEN):
  
+            #clear old kratos case files and creat new one
+            self.clear_old_and_creat_new_kratos_case_folder()
+            
             print("############### Generation {} ###############".format(g))
  
             # Apply selection based on their converted fitness
@@ -296,13 +358,14 @@ class GA:
                     nextoff.extend(offspring)
 
             #generate kratos cases according to pop 
-            self.generate_kratos_cases(nextoff)
+            self.generate_kratos_cases(g, nextoff)
 
             #check whether all the kratos cases in this generation finished
             file_num = 0
             time_count = 0
             while file_num != popsize:
-                file_num = len(glob.glob1(os.getcwd(),"*.txt"))
+                aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data_temp')
+                file_num = len(glob.glob1(aim_path_and_folder,"*.txt"))
                 sleep(60)
                 print('-----Waiting for kratos cases -----')
                 time_count += 1
@@ -310,9 +373,6 @@ class GA:
 
             #add fitness to nextoff
             nextoff = self.read_kratos_results_and_add_fitness(nextoff)
-
-            #clear old files
-            self.clear_kratos_case_files()
 
             # The population is entirely replaced by the offspring
             self.pop = nextoff
@@ -324,6 +384,9 @@ class GA:
  
             if best_ind['fitness'] > self.bestindividual['fitness']:
                 self.bestindividual = best_ind
+
+            # save the data of the best individual for post processing
+            self.save_bestindividual_results_to_results_folder()
  
             print("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
                                                            self.bestindividual['fitness']))
@@ -333,10 +396,10 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 20  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 100  # popsize must be even number
  
-    up = [30, 30, 30, 30]  # upper range for variables
-    low = [1, 1, 1, 1]  # lower range for variables
+    up = [1e10, 1e10, 1e8, 1e8]  # upper range for variables
+    low = [100, 100, 1, 1]  # lower range for variables
     parameter = [CXPB, MUTPB, NGEN, popsize, low, up]
     run = GA(parameter)
     run.GA_main()

@@ -118,6 +118,7 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
 
         # TODO: After self.CleanUpOperations() in base class!!
         self.FinalizeGraphs()
+        self.CreatEndMarkerFile()
     
     def KeepAdvancingSolutionLoop(self):
         
@@ -581,6 +582,29 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
         self.graph_export_3.close()
         self.graph_export_4.close()
         self.graph_export_5.close()
+
+    def uniquify(path):
+        filename, extension = os.path.splitext(path)
+        counter = 1
+
+        while os.path.exists(path):
+            path = filename + "_" + str(counter) + extension
+            counter += 1
+
+        return path
+    
+    def CreatEndMarkerFile(self):
+        current_folder_name = os.path.basename(os.path.dirname(__file__))
+        two_up_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+        aim_file_name = current_folder_name + '.txt'
+        aim_path = os.path.join(two_up_path,'kratos_results_data_temp', aim_file_name)
+
+        aim_path = self.uniquify(aim_path)
+
+        with open(aim_path, "w") as marker_file:
+            marker_file.write('Hello Barcelona!'+'\n')
+        marker_file.close()
 
 if __name__ == "__main__":
 
