@@ -328,7 +328,7 @@ class GA:
         new_file_name = 'best_individual_data.dat'
         aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', new_file_name)
 
-        with open(aim_path_and_name, "w") as f_w:
+        with open(aim_path_and_name, "a") as f_w:
             f_w.write(str(g_count) + ' ' + str(best_individual['Gene'].data[0])+ ' ' + str(best_individual['Gene'].data[1])+ ' ' + str(best_individual['Gene'].data[2])\
                       + ' ' + str(best_individual['Gene'].data[3]) + ' ' + str(strength_max) + ' ' + str(young_modulus_max) + '\n')
         f_w.close()
