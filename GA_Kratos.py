@@ -269,7 +269,8 @@ class GA:
                 f_w_cases_run.write('sbatch run_omp.sh' + '\n')
 
     def run_kratos_cases(self):
-        os.popen('sh cases_run.sh')
+        command_execution = 'sh cases_run.sh'
+        os.system(command_execution)
     
     def read_kratos_results_and_add_fitness(self, g_count, nextoff):
         
