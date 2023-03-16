@@ -403,6 +403,7 @@ class GA:
             #plt.title('Legend inside')
             plt.xlabel('Generation')  
             plt.ylabel('Stress / MPa') 
+            plt.axhline(y=self.aim_strength, color='gray', linestyle='-')
             ax.legend()
             fig_name = 'Strength_Generation_total.png'
             fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
@@ -414,10 +415,10 @@ class GA:
             #plt.title('Legend inside')
             plt.xlabel('Generation')  
             plt.ylabel('Young modulus / GPa') 
+            plt.axhline(y=self.aim_young_modulus, color='gray', linestyle='-')
             ax.legend()
             fig_name = 'Young_modulus_eneration_total.png'
             fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
-            fig.savefig(fig_name_and_path)
             fig.savefig(fig_name_and_path)
         else:
             print('No figure generated!')
