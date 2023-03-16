@@ -209,6 +209,7 @@ class GA:
     
     def generate_kratos_cases(self, g_count, nextoff):
 
+        print('Generating kratos cases ...')
         # creat the cases_run.sh
         cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
         with open(cases_run_path_and_name, "w") as f_w_cases_run:
@@ -269,11 +270,13 @@ class GA:
                 f_w_cases_run.write('sbatch run_omp.sh' + '\n')
 
     def run_kratos_cases(self):
+        print('Running kratos cases ...')
         command_execution = 'sh cases_run.sh'
         os.system(command_execution)
     
     def read_kratos_results_and_add_fitness(self, g_count, nextoff):
         
+        print('Reading kratos results and adding fitness ...')
         for indiv_ in nextoff:
 
             Young_mudulus_particle = str(indiv_['Gene'].data[0])
@@ -324,6 +327,7 @@ class GA:
     
     def save_and_plot_best_individual_results(self, g_count, best_individual, strength_max, young_modulus_max):
         
+        print('Saving and ploting best individual results ...')
         #save data files
         new_file_name = 'best_individual_data.dat'
         aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', new_file_name)
@@ -331,7 +335,6 @@ class GA:
         with open(aim_path_and_name, "a") as f_w:
             f_w.write(str(g_count) + ' ' + str(best_individual['Gene'].data[0])+ ' ' + str(best_individual['Gene'].data[1])+ ' ' + str(best_individual['Gene'].data[2])\
                       + ' ' + str(best_individual['Gene'].data[3]) + ' ' + str(strength_max) + ' ' + str(young_modulus_max) + '\n')
-        f_w.close()
 
         #plot and save
         Young_mudulus_particle = str(best_individual['Gene'].data[0])
