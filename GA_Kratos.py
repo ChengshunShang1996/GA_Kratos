@@ -471,6 +471,8 @@ class GA:
             #generate kratos cases according to pop 
             self.generate_kratos_cases(g, nextoff)
 
+            self.run_kratos_cases()
+
             #check whether all the kratos cases in this generation finished
             file_num = 0
             time_count = 0
