@@ -4,7 +4,7 @@ import os
 import shutil
 import glob
 from time import sleep
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from decimal import Decimal
 from distutils.dir_util import copy_tree
  
@@ -336,6 +336,7 @@ class GA:
             f_w.write(str(g_count) + ' ' + str(best_individual['Gene'].data[0])+ ' ' + str(best_individual['Gene'].data[1])+ ' ' + str(best_individual['Gene'].data[2])\
                       + ' ' + str(best_individual['Gene'].data[3]) + ' ' + str(strength_max) + ' ' + str(young_modulus_max) + '\n')
 
+        
         #plot and save
         Young_mudulus_particle = str(best_individual['Gene'].data[0])
         Young_mudulus_bond     = str(best_individual['Gene'].data[1])
@@ -344,6 +345,7 @@ class GA:
 
         aim_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
                         + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
+        ''' It seems we can not save a figure in Linux
         aim_path_and_name = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph.grf')
 
         if os.path.getsize(aim_path_and_name) != 0:
@@ -363,6 +365,7 @@ class GA:
                     experiment_strain_data_list.append(values[0]) 
                     experiment_stress_data_list.append(values[1]) 
 
+            
             fig = plt.figure()
             ax = plt.subplot(111)
             ax.plot(strain_data_list, stress_data_list, '--', label='Predicted results')
@@ -374,8 +377,10 @@ class GA:
             fig_name = 'Stress_strain_G' + str(g_count) + '.png'
             fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
             fig.savefig(fig_name_and_path)
+        
         else:
             print('No figure generated!')
+        '''
 
         #save the best individual case to results folder
         from_directory = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name)
@@ -384,6 +389,7 @@ class GA:
         #TODO: if there is already a same folder, what will happen?
         copy_tree(from_directory, to_directory)
 
+    ''' It seems we can not save a figure in Linux
     def plot_final_results(self):
 
         read_file_name = 'best_individual_data.dat'
@@ -425,7 +431,8 @@ class GA:
             fig.savefig(fig_name_and_path)
         else:
             print('No figure generated!')
-
+    '''
+    
     def GA_main(self):
         """
         main frame work of GA
@@ -502,15 +509,15 @@ class GA:
  
             if best_ind['fitness'] > self.bestindividual['fitness']:
                 self.bestindividual = best_ind
-
-            # save the data of the best individual for post processing
-            self.save_and_plot_best_individual_results(g, self.bestindividual, strength_max, young_modulus_max)
+                # save the data of the best individual for post processing
+                self.save_and_plot_best_individual_results(g, self.bestindividual, strength_max, young_modulus_max)
+            else:
+                self.save_and_plot_best_individual_results(g, best_ind, strength_max, young_modulus_max)
  
             print("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
                                                            self.bestindividual['fitness']))
             print("  Max fitness of current pop: {}".format(max(fits)))
 
-        self.plot_final_results()
         print("------ End of (successful) evolution ------")
  
  
