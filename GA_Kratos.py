@@ -6,6 +6,7 @@ import glob
 from time import sleep
 import matplotlib.pyplot as plt
 from decimal import Decimal
+from distutils.dir_util import copy_tree
  
  
 class Gene:
@@ -191,6 +192,10 @@ class GA:
             os.makedirs(kratos_temp_data_folder_name)
         else:
             os.makedirs(kratos_temp_data_folder_name)
+
+        cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
+        if os.path.exists(cases_run_path_and_name):
+            os.remove(cases_run_path_and_name)
     
     def generate_kratos_cases(self, g_count, nextoff):
 
@@ -337,15 +342,72 @@ class GA:
                     strain_data_list.append(values[0]) 
                     stress_data_list.append(values[1] * 1e-6) 
 
+            experiment_strain_data_list = []
+            experiment_stress_data_list = []
+            with open('usc.dat', 'r') as exp_stress_strain_data:
+                for line in exp_stress_strain_data:
+                    values = [float(s) for s in line.split()]
+                    experiment_strain_data_list.append(values[0]) 
+                    experiment_stress_data_list.append(values[1]) 
+
             fig = plt.figure()
             ax = plt.subplot(111)
-            ax.plot(strain_data_list, stress_data_list, label='Predicted results')
+            ax.plot(strain_data_list, stress_data_list, '--', label='Predicted results')
+            ax.plot(experiment_strain_data_list, experiment_stress_data_list, '-', label='Experiment results')
             #plt.title('Legend inside')
             plt.xlabel('Strain / %')  
             plt.ylabel('Stress / MPa') 
             ax.legend()
             fig_name = 'Stress_strain_G' + str(g_count) + '.png'
             fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
+            fig.savefig(fig_name_and_path)
+        else:
+            print('No figure generated!')
+
+        #save the best individual case to results folder
+        from_directory = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name)
+        to_directory = os.path.join(os.getcwd(),'kratos_results_data', aim_folder_name)
+
+        #TODO: if there is already a same folder, what will happen?
+        copy_tree(from_directory, to_directory)
+
+    def plot_final_results(self):
+
+        read_file_name = 'best_individual_data.dat'
+        aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', read_file_name)
+
+        if os.path.getsize(aim_path_and_name) != 0:
+            generation_id_list = []
+            strength_data_list = []
+            young_data_list = []
+            with open(aim_path_and_name, "r") as f_r:
+                for line in f_r:
+                    values = [float(s) for s in line.split()]
+                    generation_id_list.append(values[0])
+                    strength_data_list.append(values[5] * 1e-6) 
+                    young_data_list.append(values[6] * 1e-9) 
+
+            fig = plt.figure()
+            ax = plt.subplot(111)
+            ax.plot(generation_id_list, strength_data_list, 'o', label='Predicted strength')
+            #plt.title('Legend inside')
+            plt.xlabel('Generation')  
+            plt.ylabel('Stress / MPa') 
+            ax.legend()
+            fig_name = 'Strength_Generation_total.png'
+            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
+            fig.savefig(fig_name_and_path)
+
+            fig = plt.figure()
+            ax = plt.subplot(111)
+            ax.plot(generation_id_list, young_data_list, 'o', label='Predicted Young modulus')
+            #plt.title('Legend inside')
+            plt.xlabel('Generation')  
+            plt.ylabel('Young modulus / GPa') 
+            ax.legend()
+            fig_name = 'Young_modulus_eneration_total.png'
+            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
+            fig.savefig(fig_name_and_path)
             fig.savefig(fig_name_and_path)
         else:
             print('No figure generated!')
@@ -431,16 +493,17 @@ class GA:
             print("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
                                                            self.bestindividual['fitness']))
             print("  Max fitness of current pop: {}".format(max(fits)))
- 
+
+        self.plot_final_results()
         print("------ End of (successful) evolution ------")
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 100  # popsize must be even number
-    aim_strength, aim_young_modulus = 1e6, 1e9
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 10, 20  # popsize must be even number
+    aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
-    up = [1e10, 1e10, 1e8, 1e8]  # upper range for variables
-    low = [100, 100, 1, 1]  # lower range for variables
+    up = [1e8, 1e8, 1e10, 1e10]  # upper range for variables
+    low = [1e5, 1e5, 1e8, 1e8]  # lower range for variables
     parameter = [CXPB, MUTPB, NGEN, popsize, low, up, aim_strength, aim_young_modulus]
     run = GA(parameter)
     run.GA_main()
