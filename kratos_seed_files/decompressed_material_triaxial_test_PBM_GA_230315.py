@@ -583,7 +583,7 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
         self.graph_export_4.close()
         self.graph_export_5.close()
 
-    def uniquify(path):
+    def uniquify(self, path):
         filename, extension = os.path.splitext(path)
         counter = 1
 

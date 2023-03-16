@@ -196,6 +196,16 @@ class GA:
         cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
         if os.path.exists(cases_run_path_and_name):
             os.remove(cases_run_path_and_name)
+
+    def uniquify(self, path):
+        filename, extension = os.path.splitext(path)
+        counter = 1
+
+        while os.path.exists(path):
+            path = filename + "_" + str(counter) + extension
+            counter += 1
+
+        return path
     
     def generate_kratos_cases(self, g_count, nextoff):
 
@@ -216,8 +226,7 @@ class GA:
                 new_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
                                 + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
                 aim_path = os.path.join(os.getcwd(),'Generated_kratos_cases', new_folder_name)
-                if os.path.exists(aim_path):
-                    shutil.rmtree(aim_path)
+                aim_path = self.uniquify(aim_path)
                 os.mkdir(aim_path)
 
                 #copy source file
