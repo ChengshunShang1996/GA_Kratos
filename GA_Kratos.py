@@ -335,7 +335,7 @@ class GA:
         with open(aim_path_and_name, "a") as f_w:
             f_w.write(str(g_count) + ' ' + str(best_individual['Gene'].data[0])+ ' ' + str(best_individual['Gene'].data[1])+ ' ' + str(best_individual['Gene'].data[2])\
                       + ' ' + str(best_individual['Gene'].data[3]) + ' ' + str(strength_max) + ' ' + str(young_modulus_max) + '\n')
-
+        f_w.close()
         
         #plot and save
         Young_mudulus_particle = str(best_individual['Gene'].data[0])
@@ -522,7 +522,7 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 10, 20  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 5, 20  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
     up = [1e8, 1e8, 1e10, 1e10]  # upper range for variables
