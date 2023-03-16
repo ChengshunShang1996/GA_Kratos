@@ -481,9 +481,9 @@ class GA:
             while file_num != popsize:
                 aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data_temp')
                 file_num = len(glob.glob1(aim_path_and_folder,"*.txt"))
-                sleep(60)
+                sleep(12)
                 print('-----Waiting for kratos cases -----')
-                time_count += 1
+                time_count += 0.2
                 print('-------Generation {} cost {} min(s)-------'.format(g, time_count))
 
             #add fitness to nextoff
