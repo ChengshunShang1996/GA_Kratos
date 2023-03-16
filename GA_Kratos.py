@@ -165,6 +165,17 @@ class GA:
             os.makedirs(kratos_data_folder_name)
         else:
             os.makedirs(kratos_data_folder_name)
+
+        '''
+        kratos_pic_folder_name = 'kratos_results_pics'
+        aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data', kratos_pic_folder_name)
+        
+        if os.path.exists(aim_path_and_folder):
+            shutil.rmtree(aim_path_and_folder, ignore_errors=True)
+            os.makedirs(aim_path_and_folder)
+        else:
+            os.makedirs(aim_path_and_folder)
+        '''
     
     def clear_old_and_creat_new_kratos_case_folder(self):
 
@@ -175,15 +186,6 @@ class GA:
             os.makedirs(kratos_case_folder_name)
         else:
             os.makedirs(kratos_case_folder_name)
-
-        kratos_pic_folder_name = 'kratos_results_pics'
-        aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data', kratos_pic_folder_name)
-        
-        if os.path.exists(aim_path_and_folder):
-            shutil.rmtree(aim_path_and_folder, ignore_errors=True)
-            os.makedirs(aim_path_and_folder)
-        else:
-            os.makedirs(aim_path_and_folder)
 
         kratos_temp_data_folder_name = 'kratos_results_data_temp'
         
@@ -329,7 +331,7 @@ class GA:
         
         print('Saving and ploting best individual results ...')
         #save data files
-        new_file_name = 'best_individual_data.dat'
+        new_file_name = 'best_individual_data.grf'
         aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', new_file_name)
 
         with open(aim_path_and_name, "a") as f_w:
@@ -392,7 +394,7 @@ class GA:
     ''' It seems we can not save a figure in Linux
     def plot_final_results(self):
 
-        read_file_name = 'best_individual_data.dat'
+        read_file_name = 'best_individual_data.grf'
         aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', read_file_name)
 
         if os.path.getsize(aim_path_and_name) != 0:
