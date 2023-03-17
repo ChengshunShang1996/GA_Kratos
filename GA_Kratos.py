@@ -383,7 +383,7 @@ class GA:
         else:
             print('No figure generated!')
         '''
-
+        print('Coping' + aim_folder_name)
         #save the best individual case to results folder
         from_directory = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name)
         to_directory = os.path.join(os.getcwd(),'kratos_results_data', aim_folder_name)
@@ -513,8 +513,10 @@ class GA:
                 self.bestindividual = best_ind
                 # save the data of the best individual for post processing
                 self.save_and_plot_best_individual_results(g, self.bestindividual, strength_max, young_modulus_max)
+                print('best_individual')
             else:
                 self.save_and_plot_best_individual_results(g, best_ind, strength_max, young_modulus_max)
+                print('best_ind')
  
             print("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
                                                            self.bestindividual['fitness']))
