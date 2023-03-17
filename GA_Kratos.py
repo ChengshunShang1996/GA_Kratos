@@ -48,7 +48,7 @@ class GA:
  
             fitness = self.evaluate(geneinfo)  # evaluate each chromosome 
             pop.append({'Gene': Gene(data=geneinfo), 'fitness': fitness})  # store the chromosome and its fitness
- 
+
         self.pop = pop
         self.bestindividual = self.selectBest(self.pop)  # store the best chromosome in the population
         self.clear_old_and_creat_new_kratos_data_folder() # clear old and creat new kratos data folder
@@ -454,10 +454,10 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 90  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 96  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
-    up = [1e8, 1e8, 1e10, 1e10]  # upper range for variables
+    up = [1e8, 1e8, 1e11, 1e11]  # upper range for variables
     low = [1e5, 1e5, 1e8, 1e8]  # lower range for variables
     parameter = [CXPB, MUTPB, NGEN, popsize, low, up, aim_strength, aim_young_modulus]
     run = GA(parameter)
