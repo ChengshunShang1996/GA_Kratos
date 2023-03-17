@@ -3,10 +3,9 @@ from operator import itemgetter
 import os
 import shutil
 import glob
-from time import sleep
 from decimal import Decimal
 from distutils.dir_util import copy_tree
- 
+import time
  
 class Gene:
     """
@@ -363,6 +362,8 @@ class GA:
         popsize = self.parameter[3]
  
         print("Start of evolution")
+
+        start_time = time.time()
  
         # Begin the evolution
         for g in range(NGEN):
@@ -414,7 +415,7 @@ class GA:
             while file_num != popsize:
                 aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data_temp')
                 file_num = len(glob.glob1(aim_path_and_folder,"*.txt"))
-                sleep(30)
+                time.sleep(30)
                 print('-----Waiting for kratos cases -----')
                 time_count += 0.5
                 print('-------Generation {} cost {} min(s)-------'.format(g, time_count))
@@ -434,14 +435,18 @@ class GA:
                 self.bestindividual = best_ind
                 # save the data of the best individual for post processing
                 self.save_and_plot_best_individual_results(g, self.bestindividual, strength_max, young_modulus_max)
-                print('best_individual')
+                print('Saving best_individual')
             else:
                 self.save_and_plot_best_individual_results(g, best_ind, strength_max, young_modulus_max)
-                print('best_ind')
+                print('Saving best_ind')
  
             print("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
                                                            self.bestindividual['fitness']))
-            print("  Max fitness of current pop: {}".format(max(fits)))
+            print(" Max fitness of current pop: {}".format(max(fits)))
+
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            print('Total simulation time cost is {}'.format(elapsed_time))
 
         self.final_clear_kratos_case_and_data_folder()
         print("------ End of (successful) evolution ------")
