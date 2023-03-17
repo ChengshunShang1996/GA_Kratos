@@ -414,9 +414,9 @@ class GA:
             while file_num != popsize:
                 aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data_temp')
                 file_num = len(glob.glob1(aim_path_and_folder,"*.txt"))
-                sleep(12)
+                sleep(30)
                 print('-----Waiting for kratos cases -----')
-                time_count += 0.2
+                time_count += 0.5
                 print('-------Generation {} cost {} min(s)-------'.format(g, time_count))
 
             #add fitness to nextoff
@@ -448,7 +448,7 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 5, 20  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 45  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
     up = [1e8, 1e8, 1e10, 1e10]  # upper range for variables

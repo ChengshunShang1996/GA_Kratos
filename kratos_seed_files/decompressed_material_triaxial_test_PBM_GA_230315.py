@@ -292,7 +292,8 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
     
     def CheckSimulationEnd(self):
 
-        if self.total_stress_mean_max_time < 0.5 * self.time or self.strain > 5.0:
+        #if self.total_stress_mean_max_time < 0.5 * self.time or self.strain > 5.0:
+        if self.strain > 1.2:
             self.end_sim = 2   # means end the simulation
 
     def ComputeMeasuringSurface(self):
@@ -603,7 +604,7 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
         aim_path = self.uniquify(aim_path)
 
         with open(aim_path, "w") as marker_file:
-            marker_file.write('Hello Barcelona!'+'\n')
+            marker_file.write('HOLA Barcelona!'+'\n')
         marker_file.close()
 
 if __name__ == "__main__":

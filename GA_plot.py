@@ -101,6 +101,8 @@ def plot_final_results():
     else:
         print('File best_individual_data.grf is empty!')
 
+print('Starting to plot ...')
 creat_folder()
 plot_every_generation()
 plot_final_results()
+print('Finish plotting!')
