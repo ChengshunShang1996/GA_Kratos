@@ -342,6 +342,20 @@ class GA:
         to_directory = os.path.join(os.getcwd(),'kratos_results_data', to_folder_name)
         copy_tree(from_directory, to_directory)
     
+    def final_clear_kratos_case_and_data_folder(self):
+
+        kratos_case_folder_name = 'Generated_kratos_cases'
+        if os.path.exists(kratos_case_folder_name):
+            shutil.rmtree(kratos_case_folder_name, ignore_errors=True)
+
+        kratos_temp_data_folder_name = 'kratos_results_data_temp'
+        if os.path.exists(kratos_temp_data_folder_name):
+            shutil.rmtree(kratos_temp_data_folder_name, ignore_errors=True)
+
+        cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
+        if os.path.exists(cases_run_path_and_name):
+            os.remove(cases_run_path_and_name)
+    
     def GA_main(self):
         """
         main frame work of GA
@@ -429,6 +443,7 @@ class GA:
                                                            self.bestindividual['fitness']))
             print("  Max fitness of current pop: {}".format(max(fits)))
 
+        self.final_clear_kratos_case_and_data_folder()
         print("------ End of (successful) evolution ------")
  
  

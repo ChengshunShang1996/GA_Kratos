@@ -14,7 +14,7 @@ def creat_folder():
 
 def plot_every_generation():
 
-    NGEN = 5
+    NGEN = 4
 
     for g_count in range(NGEN):
 
@@ -49,7 +49,7 @@ def plot_every_generation():
             plt.ylabel('Stress / MPa') 
             ax.legend()
             fig_name = 'Stress_strain_G' + str(g_count) + '.png'
-            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
+            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_pics', fig_name)
             fig.savefig(fig_name_and_path)
         
         else:
@@ -61,7 +61,7 @@ def plot_final_results():
     aim_strength = 4.323e7
     aim_young_modulus = 5.54e9
     
-    read_file_name = 'best_individual_data.grf'
+    read_file_name = 'best_individual_data.txt'
     aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', read_file_name)
 
     if os.path.getsize(aim_path_and_name) != 0:
@@ -84,7 +84,7 @@ def plot_final_results():
         plt.axhline(y=aim_strength, color='gray', linestyle='-')
         ax.legend()
         fig_name = 'Strength_Generation_total.png'
-        fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
+        fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_pics', fig_name)
         fig.savefig(fig_name_and_path)
 
         fig = plt.figure()
@@ -96,7 +96,7 @@ def plot_final_results():
         plt.axhline(y=aim_young_modulus, color='gray', linestyle='-')
         ax.legend()
         fig_name = 'Young_modulus_eneration_total.png'
-        fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
+        fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_pics', fig_name)
         fig.savefig(fig_name_and_path)
     else:
         print('File best_individual_data.grf is empty!')
@@ -104,6 +104,3 @@ def plot_final_results():
 creat_folder()
 plot_every_generation()
 plot_final_results()
-
-
-    
