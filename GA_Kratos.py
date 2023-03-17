@@ -286,7 +286,7 @@ class GA:
                         values = [float(s) for s in line.split()]
                         stress_data_list.append(values[1]) 
                 strength_max = max(stress_data_list)
-                rel_error_strength = (strength_max - self.aim_strength)**2
+                rel_error_strength = ((strength_max - self.aim_strength) / self.aim_strength)**2
             else:
                 strength_max = 0.0
                 rel_error_strength = (self.aim_strength)**2
@@ -301,7 +301,7 @@ class GA:
                         values = [float(s) for s in line.split()]
                         young_data_list.append(values[1]) 
                 young_modulus_max = max(young_data_list)
-                rel_error_young_modulus = (young_modulus_max - self.aim_young_modulus)**2
+                rel_error_young_modulus = ((young_modulus_max - self.aim_young_modulus) / self.aim_young_modulus)**2
             else:
                 young_modulus_max = 0.0
                 rel_error_young_modulus = (self.aim_young_modulus)**2
