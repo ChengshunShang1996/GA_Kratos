@@ -4,7 +4,6 @@ import os
 import shutil
 import glob
 from time import sleep
-#import matplotlib.pyplot as plt
 from decimal import Decimal
 from distutils.dir_util import copy_tree
  
@@ -165,17 +164,6 @@ class GA:
             os.makedirs(kratos_data_folder_name)
         else:
             os.makedirs(kratos_data_folder_name)
-
-        '''
-        kratos_pic_folder_name = 'kratos_results_pics'
-        aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data', kratos_pic_folder_name)
-        
-        if os.path.exists(aim_path_and_folder):
-            shutil.rmtree(aim_path_and_folder, ignore_errors=True)
-            os.makedirs(aim_path_and_folder)
-        else:
-            os.makedirs(aim_path_and_folder)
-        '''
     
     def clear_old_and_creat_new_kratos_case_folder(self):
 
@@ -345,95 +333,14 @@ class GA:
         sigma_max_bond         = str(best_individual['Gene'].data[2])
         cohesion_ini_bond      = str(best_individual['Gene'].data[3])
 
-        aim_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
+        from_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
                         + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
-        ''' It seems we can not save a figure in Linux
-        aim_path_and_name = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph.grf')
-
-        if os.path.getsize(aim_path_and_name) != 0:
-            strain_data_list = []
-            stress_data_list = []
-            with open(aim_path_and_name, 'r') as stress_strain_data:
-                for line in stress_strain_data:
-                    values = [float(s) for s in line.split()]
-                    strain_data_list.append(values[0]) 
-                    stress_data_list.append(values[1] * 1e-6) 
-
-            experiment_strain_data_list = []
-            experiment_stress_data_list = []
-            with open('usc.dat', 'r') as exp_stress_strain_data:
-                for line in exp_stress_strain_data:
-                    values = [float(s) for s in line.split()]
-                    experiment_strain_data_list.append(values[0]) 
-                    experiment_stress_data_list.append(values[1]) 
-
-            
-            fig = plt.figure()
-            ax = plt.subplot(111)
-            ax.plot(strain_data_list, stress_data_list, '--', label='Predicted results')
-            ax.plot(experiment_strain_data_list, experiment_stress_data_list, '-', label='Experiment results')
-            #plt.title('Legend inside')
-            plt.xlabel('Strain / %')  
-            plt.ylabel('Stress / MPa') 
-            ax.legend()
-            fig_name = 'Stress_strain_G' + str(g_count) + '.png'
-            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
-            fig.savefig(fig_name_and_path)
-        
-        else:
-            print('No figure generated!')
-        '''
-        print('Coping' + aim_folder_name)
+        to_folder_name = 'G_' + str(g_count)
+        print('Coping ' + from_folder_name)
         #save the best individual case to results folder
-        from_directory = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name)
-        to_directory = os.path.join(os.getcwd(),'kratos_results_data', aim_folder_name)
-
-        #TODO: if there is already a same folder, what will happen?
+        from_directory = os.path.join(os.getcwd(),'Generated_kratos_cases', from_folder_name)
+        to_directory = os.path.join(os.getcwd(),'kratos_results_data', to_folder_name)
         copy_tree(from_directory, to_directory)
-
-    ''' It seems we can not save a figure in Linux
-    def plot_final_results(self):
-
-        read_file_name = 'best_individual_data.grf'
-        aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', read_file_name)
-
-        if os.path.getsize(aim_path_and_name) != 0:
-            generation_id_list = []
-            strength_data_list = []
-            young_data_list = []
-            with open(aim_path_and_name, "r") as f_r:
-                for line in f_r:
-                    values = [float(s) for s in line.split()]
-                    generation_id_list.append(values[0])
-                    strength_data_list.append(values[5] * 1e-6) 
-                    young_data_list.append(values[6] * 1e-9) 
-
-            fig = plt.figure()
-            ax = plt.subplot(111)
-            ax.plot(generation_id_list, strength_data_list, 'o', label='Predicted strength')
-            #plt.title('Legend inside')
-            plt.xlabel('Generation')  
-            plt.ylabel('Stress / MPa') 
-            plt.axhline(y=self.aim_strength, color='gray', linestyle='-')
-            ax.legend()
-            fig_name = 'Strength_Generation_total.png'
-            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
-            fig.savefig(fig_name_and_path)
-
-            fig = plt.figure()
-            ax = plt.subplot(111)
-            ax.plot(generation_id_list, young_data_list, 'o', label='Predicted Young modulus')
-            #plt.title('Legend inside')
-            plt.xlabel('Generation')  
-            plt.ylabel('Young modulus / GPa') 
-            plt.axhline(y=self.aim_young_modulus, color='gray', linestyle='-')
-            ax.legend()
-            fig_name = 'Young_modulus_eneration_total.png'
-            fig_name_and_path = os.path.join(os.getcwd(),'kratos_results_data', 'kratos_results_pics', fig_name)
-            fig.savefig(fig_name_and_path)
-        else:
-            print('No figure generated!')
-    '''
     
     def GA_main(self):
         """
