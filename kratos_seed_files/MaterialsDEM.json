@@ -23,7 +23,7 @@
         "material_ids_list"   : [1,1],
         "Variables"           : {
             "PARTICLE_MATERIAL": 1,
-            "DEM_DISCONTINUUM_CONSTITUTIVE_LAW_NAME" : "DEM_D_Quadratic",
+            "DEM_DISCONTINUUM_CONSTITUTIVE_LAW_NAME" : "DEM_D_Hertz_viscous_Coulomb",
             "STATIC_FRICTION"                        : 0.25,
             "DYNAMIC_FRICTION"                       : 0.24,
             "FRICTION_DECAY"                         : 500,
@@ -32,7 +32,7 @@
             "DEM_ROLLING_FRICTION_MODEL_NAME"        : "DEMRollingFrictionModelConstantTorque",
             "ROLLING_FRICTION"                       : 0.01,
             "ROLLING_FRICTION_WITH_WALLS"            : 0.01,
-            "DEM_CONTINUUM_CONSTITUTIVE_LAW_NAME"    : "DEM_parallel_bond_Quadratic",
+            "DEM_CONTINUUM_CONSTITUTIVE_LAW_NAME"    : "DEM_parallel_bond_Hertz",
             "BOND_YOUNG_MODULUS"                     : 3.0e8,
             "BOND_KNKS_RATIO"                        : 2.5,
             "BOND_SIGMA_MAX"                         : 1e5,
@@ -62,7 +62,7 @@
             "ROLLING_FRICTION": 0.01,
             "ROLLING_FRICTION_WITH_WALLS": 0.01,
             "K_ALPHA" : 45.0,
-            "DEM_DISCONTINUUM_CONSTITUTIVE_LAW_NAME": "DEM_D_Quadratic"
+            "DEM_DISCONTINUUM_CONSTITUTIVE_LAW_NAME": "DEM_D_Hertz_viscous_Coulomb"
         }
     }],
     "material_assignation_table" : [["SpheresPart.DEMParts_Body","DEM-P"],
