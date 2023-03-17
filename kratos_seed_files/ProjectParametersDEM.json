@@ -20,7 +20,7 @@
     "CleanIndentationsOption"             : true,
     "VirtualMassCoefficient"              : 1.0,
     "RollingFrictionOption"               : true,
-    "GlobalDamping"                       : 0.0,
+    "GlobalDamping"                       : 0.2,
     "ContactMeshOption"                   : true,
     "OutputFileType"                      : "Binary",
     "Multifile"                           : "multiple_files",

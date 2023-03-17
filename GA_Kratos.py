@@ -46,7 +46,7 @@ class GA:
             for pos in range(len(low)):
                 geneinfo.append(random.randint(self.bound[0][pos], self.bound[1][pos]))  # initialise popluation
  
-            fitness = self.evaluate(geneinfo)  # evaluate each chromosome
+            fitness = self.evaluate(geneinfo)  # evaluate each chromosome 
             pop.append({'Gene': Gene(data=geneinfo), 'fitness': fitness})  # store the chromosome and its fitness
  
         self.pop = pop
@@ -63,7 +63,7 @@ class GA:
         x2 = geneinfo[1]
         x3 = geneinfo[2]
         x4 = geneinfo[3]
-        y = 1 / (x1**2 + x2**2 + x3**3 - x4**4)
+        y = 1 / ((x1**2 + x2**2 + x3**2 + x4**2) * 1e5) #set the initial fitness a very small value
         return y
  
     def selectBest(self, pop):
@@ -376,7 +376,7 @@ class GA:
  
             # Apply selection based on their converted fitness
             selectpop = self.selection(self.pop, popsize)
- 
+
             nextoff = []
             while len(nextoff) != popsize:
                 # Apply crossover and mutation on the offspring
@@ -396,8 +396,8 @@ class GA:
                         nextoff.append({'Gene': muteoff1})
                         nextoff.append({'Gene': muteoff2})
                     else:
-                        fit_crossoff1 = self.evaluate(crossoff1.data)  # Evaluate the individuals
-                        fit_crossoff2 = self.evaluate(crossoff2.data)
+                        #fit_crossoff1 = self.evaluate(crossoff1.data)  # Evaluate the individuals
+                        #fit_crossoff2 = self.evaluate(crossoff2.data)
                         #nextoff.append({'Gene': crossoff1, 'fitness': fit_crossoff1})
                         #nextoff.append({'Gene': crossoff2, 'fitness': fit_crossoff2})
                         nextoff.append({'Gene': crossoff1})
@@ -454,7 +454,7 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 46  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 90  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
     up = [1e8, 1e8, 1e10, 1e10]  # upper range for variables

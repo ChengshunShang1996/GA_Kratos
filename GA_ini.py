@@ -43,7 +43,9 @@ class GA:
  
             fitness = self.evaluate(geneinfo)  # evaluate each chromosome
             pop.append({'Gene': Gene(data=geneinfo), 'fitness': fitness})  # store the chromosome and its fitness
- 
+
+        for ind__ in pop:
+            print(str(ind__['Gene'].data[0]) + ' ' + str(ind__['Gene'].data[1]) + ' ' + str(ind__['Gene'].data[2]) + ' ' + str(ind__['Gene'].data[3]))
         self.pop = pop
         self.bestindividual = self.selectBest(self.pop)  # store the best chromosome in the population
  
@@ -205,10 +207,12 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 100  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 20  # popsize must be even number
  
-    up = [30, 30, 30, 30]  # upper range for variables
-    low = [1, 1, 1, 1]  # lower range for variables
+    #up = [30, 30, 30, 30]  # upper range for variables
+    #low = [1, 1, 1, 1]  # lower range for variables
+    up = [1e8, 1e8, 1e10, 1e10]  # upper range for variables
+    low = [1e5, 1e5, 1e8, 1e8]  # lower range for variables
     parameter = [CXPB, MUTPB, NGEN, popsize, low, up]
     run = GA(parameter)
     run.GA_main()
