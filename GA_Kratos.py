@@ -249,7 +249,8 @@ class GA:
                             with open(aim_file_path_and_name, "w") as f_run_omp_w:
                                 for line in f_run_omp.readlines():
                                     if "BTS-Q-Ep6.2e10-T1e3-f0.1" in line:
-                                        line = line.replace("BTS-Q-Ep6.2e10-T1e3-f0.1", new_folder_name)
+                                        hpc_case_name = os.path.basename(aim_path)
+                                        line = line.replace("BTS-Q-Ep6.2e10-T1e3-f0.1", hpc_case_name)
                                     f_run_omp_w.write(line)
                     else:
                         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name) 

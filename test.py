@@ -1,7 +1,5 @@
-import time
+import os
 
-start_time = time.time()
-time.sleep(5)
-end_time = time.time()
-elapsed_time = end_time - start_time
-print('Total simulation time cost is {}'.format(elapsed_time))
+test_path = '\\dd\\test\\211ww'
+current_folder_name = os.path.basename(test_path)
+print(current_folder_name)
