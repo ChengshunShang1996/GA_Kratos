@@ -48,7 +48,10 @@ class GA:
  
             fitness = self.evaluate(geneinfo)  # evaluate each chromosome 
             pop.append({'Gene': Gene(data=geneinfo), 'fitness': fitness})  # store the chromosome and its fitness
-
+            #pop.append({'Gene': Gene(data=geneinfo)})
+        
+        #for inin in pop:
+        #    print(str(inin['Gene'].data[0]) + ' ' + str(inin['Gene'].data[1]) + ' ' + str(inin['Gene'].data[2]) + ' ' + str(inin['Gene'].data[3]))
         self.pop = pop
         self.bestindividual = self.selectBest(self.pop)  # store the best chromosome in the population
         self.clear_old_and_creat_new_kratos_data_folder() # clear old and creat new kratos data folder
@@ -374,36 +377,39 @@ class GA:
             
             print("############### Generation {} ###############".format(g))
  
-            # Apply selection based on their converted fitness
-            selectpop = self.selection(self.pop, popsize)
+            if g != 0:
+                # Apply selection based on their converted fitness
+                selectpop = self.selection(self.pop, popsize)
 
-            nextoff = []
-            while len(nextoff) != popsize:
-                # Apply crossover and mutation on the offspring
- 
-                # Select two individuals
-                offspring = [selectpop.pop() for _ in range(2)]
- 
-                if random.random() < CXPB:  # cross two individuals with probability CXPB
-                    crossoff1, crossoff2 = self.crossoperate(offspring)
-                    if random.random() < MUTPB:  # mutate an individual with probability MUTPB
-                        muteoff1 = self.mutation(crossoff1, self.bound)
-                        muteoff2 = self.mutation(crossoff2, self.bound)
-                        #fit_muteoff1 = self.evaluate(muteoff1.data)  # Evaluate the individuals
-                        #fit_muteoff2 = self.evaluate(muteoff2.data)  # Evaluate the individuals
-                        #nextoff.append({'Gene': muteoff1, 'fitness': fit_muteoff1})
-                        #nextoff.append({'Gene': muteoff2, 'fitness': fit_muteoff2})
-                        nextoff.append({'Gene': muteoff1})
-                        nextoff.append({'Gene': muteoff2})
+                nextoff = []
+                while len(nextoff) != popsize:
+                    # Apply crossover and mutation on the offspring
+    
+                    # Select two individuals
+                    offspring = [selectpop.pop() for _ in range(2)]
+    
+                    if random.random() < CXPB:  # cross two individuals with probability CXPB
+                        crossoff1, crossoff2 = self.crossoperate(offspring)
+                        if random.random() < MUTPB:  # mutate an individual with probability MUTPB
+                            muteoff1 = self.mutation(crossoff1, self.bound)
+                            muteoff2 = self.mutation(crossoff2, self.bound)
+                            #fit_muteoff1 = self.evaluate(muteoff1.data)  # Evaluate the individuals
+                            #fit_muteoff2 = self.evaluate(muteoff2.data)  # Evaluate the individuals
+                            #nextoff.append({'Gene': muteoff1, 'fitness': fit_muteoff1})
+                            #nextoff.append({'Gene': muteoff2, 'fitness': fit_muteoff2})
+                            nextoff.append({'Gene': muteoff1})
+                            nextoff.append({'Gene': muteoff2})
+                        else:
+                            #fit_crossoff1 = self.evaluate(crossoff1.data)  # Evaluate the individuals
+                            #fit_crossoff2 = self.evaluate(crossoff2.data)
+                            #nextoff.append({'Gene': crossoff1, 'fitness': fit_crossoff1})
+                            #nextoff.append({'Gene': crossoff2, 'fitness': fit_crossoff2})
+                            nextoff.append({'Gene': crossoff1})
+                            nextoff.append({'Gene': crossoff2})
                     else:
-                        #fit_crossoff1 = self.evaluate(crossoff1.data)  # Evaluate the individuals
-                        #fit_crossoff2 = self.evaluate(crossoff2.data)
-                        #nextoff.append({'Gene': crossoff1, 'fitness': fit_crossoff1})
-                        #nextoff.append({'Gene': crossoff2, 'fitness': fit_crossoff2})
-                        nextoff.append({'Gene': crossoff1})
-                        nextoff.append({'Gene': crossoff2})
-                else:
-                    nextoff.extend(offspring)
+                        nextoff.extend(offspring)
+            else:
+                nextoff = self.pop
 
             #generate kratos cases according to pop 
             self.generate_kratos_cases(g, nextoff)
@@ -454,11 +460,11 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.1, 1000, 96  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.2, 1000, 96  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
-    up = [1e8, 1e8, 1e11, 1e11]  # upper range for variables
-    low = [1e5, 1e5, 1e8, 1e8]  # lower range for variables
+    up  = [5e11, 5e11, 1e8, 1e8]  # upper range for variables
+    low = [1e8, 1e8, 1e6, 1e6,]  # lower range for variables
     parameter = [CXPB, MUTPB, NGEN, popsize, low, up, aim_strength, aim_young_modulus]
     run = GA(parameter)
     run.GA_main()
