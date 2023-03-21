@@ -203,6 +203,7 @@ class GA:
     def generate_kratos_cases(self, g_count, nextoff):
 
         print('Generating kratos cases ...')
+        self.end_sim_file_num = 0
         # creat the cases_run.sh
         cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
         with open(cases_run_path_and_name, "w") as f_w_cases_run:
@@ -264,6 +265,7 @@ class GA:
                 if aim_path_change_marker == 0:
                     f_w_cases_run.write('cd '+ aim_path + '\n')
                     f_w_cases_run.write('sbatch run_omp.sh' + '\n')
+                    self.end_sim_file_num += 1
 
     def run_kratos_cases(self):
         print('Running kratos cases ...')
@@ -422,7 +424,7 @@ class GA:
             #check whether all the kratos cases in this generation finished
             file_num = 0
             time_count = 0
-            while file_num != popsize:
+            while file_num != self.end_sim_file_num:
                 aim_path_and_folder = os.path.join(os.getcwd(),'kratos_results_data_temp')
                 file_num = len(glob.glob1(aim_path_and_folder,"*.txt"))
                 time.sleep(30)
