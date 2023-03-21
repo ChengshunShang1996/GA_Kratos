@@ -261,7 +261,7 @@ class GA:
                         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name) 
 
                 # write the cases_run.sh
-                if aim_path_change_marker != 0:
+                if aim_path_change_marker == 0:
                     f_w_cases_run.write('cd '+ aim_path + '\n')
                     f_w_cases_run.write('sbatch run_omp.sh' + '\n')
 
