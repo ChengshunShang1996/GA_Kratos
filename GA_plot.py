@@ -58,8 +58,8 @@ def plot_every_generation():
 
 def plot_final_results():
 
-    aim_strength = 4.323e7
-    aim_young_modulus = 5.54e9
+    aim_strength = 43.23 #MPa
+    aim_young_modulus = 5.54  #GPa
     
     read_file_name = 'best_individual_data.txt'
     aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', read_file_name)

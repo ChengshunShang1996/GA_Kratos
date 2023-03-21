@@ -269,7 +269,7 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
 
         stress_mean_delta = self.total_stress_mean - self.old_stress_mean
 
-        self.young_modulus = stress_mean_delta / strain_delta
+        self.young_modulus = stress_mean_delta / (strain_delta / 100)
 
         self.old_stress_mean = self.total_stress_mean
 
