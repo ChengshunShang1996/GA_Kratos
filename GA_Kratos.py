@@ -189,15 +189,16 @@ class GA:
         if os.path.exists(cases_run_path_and_name):
             os.remove(cases_run_path_and_name)
 
-    def uniquify(self, path):
+    def uniquify(self, path, path_change_marker):
         filename, extension = os.path.splitext(path)
         counter = 1
 
         while os.path.exists(path):
             path = filename + "_" + str(counter) + extension
             counter += 1
+            path_change_marker += 1
 
-        return path
+        return path, path_change_marker
     
     def generate_kratos_cases(self, g_count, nextoff):
 
@@ -219,7 +220,8 @@ class GA:
                 new_folder_name = 'G' + str(g_count) + '_Ep' + Young_mudulus_particle + '_Eb' + Young_mudulus_bond\
                                 + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
                 aim_path = os.path.join(os.getcwd(),'Generated_kratos_cases', new_folder_name)
-                aim_path = self.uniquify(aim_path)
+                aim_path_change_marker = 0
+                aim_path, aim_path_change_marker = self.uniquify(aim_path, aim_path_change_marker)
                 os.mkdir(aim_path)
 
                 #copy source file
@@ -259,8 +261,9 @@ class GA:
                         shutil.copyfile(seed_file_path_and_name, aim_file_path_and_name) 
 
                 # write the cases_run.sh
-                f_w_cases_run.write('cd '+ aim_path + '\n')
-                f_w_cases_run.write('sbatch run_omp.sh' + '\n')
+                if aim_path_change_marker != 0:
+                    f_w_cases_run.write('cd '+ aim_path + '\n')
+                    f_w_cases_run.write('sbatch run_omp.sh' + '\n')
 
     def run_kratos_cases(self):
         print('Running kratos cases ...')
