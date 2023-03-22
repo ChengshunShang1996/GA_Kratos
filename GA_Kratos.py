@@ -465,7 +465,7 @@ class GA:
  
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.2, 1000, 96  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.2, 1000, 100  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
     up  = [1e11, 1e11, 1e8, 1e8]  # upper range for variables
