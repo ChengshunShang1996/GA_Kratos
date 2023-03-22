@@ -321,9 +321,9 @@ class GA:
 
             indiv_['fitness'] = fitness
     
-        return nextoff, strength_max, young_modulus_max
+        return nextoff
     
-    def save_and_plot_best_individual_results(self, g_count, best_individual, strength_max, young_modulus_max):
+    def save_and_plot_best_individual_results(self, g_count, best_individual):
         
         print('Saving and ploting best individual results ...')
         #save data files
@@ -332,7 +332,7 @@ class GA:
 
         with open(aim_path_and_name, "a+") as f_w:
             f_w.write(str(g_count) + ' ' + str(best_individual['Gene'].data[0])+ ' ' + str(best_individual['Gene'].data[1])+ ' ' + str(best_individual['Gene'].data[2])\
-                      + ' ' + str(best_individual['Gene'].data[3]) + ' ' + str(strength_max) + ' ' + str(young_modulus_max) + '\n')
+                      + ' ' + str(best_individual['Gene'].data[3]) + '\n')
         f_w.close()
         
         #plot and save
@@ -433,7 +433,7 @@ class GA:
                 print('-------Generation {} cost {} min(s)-------'.format(g, time_count))
 
             #add fitness to nextoff
-            nextoff, strength_max, young_modulus_max = self.read_kratos_results_and_add_fitness(g, nextoff)
+            nextoff = self.read_kratos_results_and_add_fitness(g, nextoff)
 
             # The population is entirely replaced by the offspring
             self.pop = nextoff
@@ -446,10 +446,10 @@ class GA:
             if best_ind['fitness'] > self.bestindividual['fitness']:
                 self.bestindividual = best_ind
                 # save the data of the best individual for post processing
-                self.save_and_plot_best_individual_results(g, self.bestindividual, strength_max, young_modulus_max)
+                self.save_and_plot_best_individual_results(g, self.bestindividual)
                 print('Saving best_individual')
             else:
-                self.save_and_plot_best_individual_results(g, best_ind, strength_max, young_modulus_max)
+                self.save_and_plot_best_individual_results(g, best_ind)
                 print('Saving best_ind')
  
             print("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
