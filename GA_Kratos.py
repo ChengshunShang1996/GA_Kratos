@@ -468,7 +468,7 @@ if __name__ == "__main__":
     CXPB, MUTPB, NGEN, popsize = 0.8, 0.2, 1000, 100  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
  
-    up  = [5e11, 5e11, 1e8, 1e8]  # upper range for variables
+    up  = [1e11, 1e11, 1e8, 1e8]  # upper range for variables
     low = [5e8, 5e8, 1e6, 1e6,]  # lower range for variables
     parameter = [CXPB, MUTPB, NGEN, popsize, low, up, aim_strength, aim_young_modulus]
     run = GA(parameter)
