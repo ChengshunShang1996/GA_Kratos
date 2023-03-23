@@ -148,8 +148,10 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
         self.sigma_mean_table = []; self.tau_mean_table = []; self.sigma_rel_std_dev_table = []; self.tau_rel_std_dev_table = []; self.sigma_ratio_table = []
         self.total_stress_mean_max = 0.0
         self.total_stress_mean_max_time = 0.0
-        self.old_stress_mean = 0.0
         self.young_modulus = 0.0
+        self.young_cal_counter = 0
+        self.last_stress_mean_for_young_cal = 0.0
+        self.last_strain_mean_for_young_cal = 0.0
 
         for i in range(0,18):
             self.sizes.append(0.0)
@@ -161,7 +163,7 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
 
         self.graph_counter = 0; self.renew_pressure = 0; self.Pressure = 0.0; self.pressure_to_apply = 0.0; self.CN_graph_counter = 0
         self.length_correction_factor = 1.0
-        self.graph_frequency        = int(self.parameters["GraphExportFreq"].GetDouble()/self.spheres_model_part.ProcessInfo.GetValue(DELTA_TIME))
+        self.graph_frequency = int(self.parameters["GraphExportFreq"].GetDouble()/self.spheres_model_part.ProcessInfo.GetValue(DELTA_TIME))
         self.strain = 0.0; self.strain_bts = 0.0; self.volumetric_strain = 0.0; self.radial_strain = 0.0; self.first_time_entry = 1; self.first_time_entry_2 = 1
         self.total_stress_top = 0.0; self.total_stress_bot = 0.0; self.total_stress_mean = 0.0
         self.LoadingVelocity = 0.0
@@ -267,11 +269,17 @@ class DecompressedMaterialTriaxialTest(DEMAnalysisStage):
         
         self.total_stress_mean = 0.5 * (self.total_stress_bot + self.total_stress_top)
 
-        stress_mean_delta = self.total_stress_mean - self.old_stress_mean
-
-        self.young_modulus = stress_mean_delta / (strain_delta / 100)
-
-        self.old_stress_mean = self.total_stress_mean
+        if self.young_cal_counter == self.graph_frequency:
+            self.young_cal_counter = 0
+            stress_mean_delta = self.total_stress_mean - self.last_stress_mean_for_young_cal
+            strain_delta_for_young_cal = self.strain - self.last_strain_mean_for_young_cal
+            if strain_delta_for_young_cal != 0.0:
+                self.young_modulus = stress_mean_delta / (strain_delta_for_young_cal / 100)
+            else:
+                print("*************************strain_delta_for_young_cal is 0.0 !***************")
+            self.last_stress_mean_for_young_cal = self.total_stress_mean
+            self.last_strain_mean_for_young_cal = self.strain
+        self.young_cal_counter += 1
 
         if self.total_stress_mean_max < self.total_stress_mean:
             self.total_stress_mean_max = self.total_stress_mean
