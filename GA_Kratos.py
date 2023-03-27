@@ -57,6 +57,7 @@ class GA:
         self.clear_old_and_creat_new_kratos_data_folder() # clear old and creat new kratos data folder
         self.aim_strength = parameter[6]
         self.aim_young_modulus = parameter[7]
+        self.aim_strain = parameter[8]
  
     def evaluate(self, geneinfo):
         """
@@ -289,15 +290,21 @@ class GA:
 
             if os.path.getsize(aim_path_and_name) != 0:
                 stress_data_list = []
+                strain_data_list = []
                 with open(aim_path_and_name, 'r') as stress_strain_data:
                     for line in stress_strain_data:
                         values = [float(s) for s in line.split()]
                         stress_data_list.append(values[1]) 
+                        strain_data_list.append(values[0])
                 strength_max = max(stress_data_list)
+                strain_max = strain_data_list[stress_data_list.index(max(stress_data_list))]
                 rel_error_strength = ((strength_max - self.aim_strength) / self.aim_strength)**2
+                rel_error_starin   = ((strain_max - self.aim_strain) / self.aim_strain)**2
             else:
                 strength_max = 0.0
+                strain_max = 0.0
                 rel_error_strength = (self.aim_strength)**2
+                rel_error_starin   = (self.aim_strain)**2
 
             #the Young modulus files
             aim_path_and_name = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph_young.grf')
@@ -314,8 +321,8 @@ class GA:
                 young_modulus_max = 0.0
                 rel_error_young_modulus = (self.aim_young_modulus)**2
 
-            if rel_error_strength + rel_error_young_modulus:
-                fitness = 1 / (rel_error_strength + rel_error_young_modulus)
+            if rel_error_strength + rel_error_young_modulus + rel_error_starin:
+                fitness = 1 / (rel_error_strength + rel_error_young_modulus + rel_error_starin)
             else:
                 fitness = 0
 
@@ -467,9 +474,10 @@ class GA:
 if __name__ == "__main__":
     CXPB, MUTPB, NGEN, popsize = 0.8, 0.2, 1000, 200  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
+    aim_strain = 1.01265
  
     up  = [1e11, 1e11, 1e8, 1e8]  # upper range for variables
     low = [5e8, 5e8, 1e6, 1e6,]  # lower range for variables
-    parameter = [CXPB, MUTPB, NGEN, popsize, low, up, aim_strength, aim_young_modulus]
+    parameter = [CXPB, MUTPB, NGEN, popsize, low, up, aim_strength, aim_young_modulus, aim_strain]
     run = GA(parameter)
     run.GA_main()
