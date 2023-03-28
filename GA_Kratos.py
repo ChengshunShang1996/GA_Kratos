@@ -327,7 +327,16 @@ class GA:
                 fitness = 0
 
             indiv_['fitness'] = fitness
-    
+
+            #write out individual data for ML
+            output_file_name = 'G_' + str(g_count) + '.txt' 
+            aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', output_file_name)
+
+            with open(aim_path_and_name, "a+") as f_w:
+                f_w.write(str(indiv_['Gene'].data[0])+ ',' + str(indiv_['Gene'].data[1])+ ',' + str(indiv_['Gene'].data[2])\
+                        + ',' + str(indiv_['Gene'].data[3]) + ',' + str(strength_max) + ',' + str(strain_max) + ',' + str(young_modulus_max)+'\n')
+                f_w.close()
+
         return nextoff
     
     def save_and_plot_best_individual_results(self, g_count, best_individual):
