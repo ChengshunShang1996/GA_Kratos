@@ -6,6 +6,7 @@ import glob
 from decimal import Decimal
 from distutils.dir_util import copy_tree
 import time
+import csv
  
 class Gene:
     """
@@ -58,6 +59,7 @@ class GA:
         self.aim_strength = parameter[6]
         self.aim_young_modulus = parameter[7]
         self.aim_strain = parameter[8]
+        self.indiv_data_head_not_written = True
  
     def evaluate(self, geneinfo):
         """
@@ -329,12 +331,24 @@ class GA:
             indiv_['fitness'] = fitness
 
             #write out individual data for ML
-            output_file_name = 'G_' + str(g_count) + '.txt' 
+            output_file_name = 'G_info.csv' 
             aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', output_file_name)
 
-            with open(aim_path_and_name, "a+") as f_w:
-                f_w.write(str(indiv_['Gene'].data[0])+ ',' + str(indiv_['Gene'].data[1])+ ',' + str(indiv_['Gene'].data[2])\
-                        + ',' + str(indiv_['Gene'].data[3]) + ',' + str(strength_max) + ',' + str(strain_max) + ',' + str(young_modulus_max)+'\n')
+            indiv_data_head = ['Young_mudulus_particle', 'Young_mudulus_bond', 'sigma_max_bond', 'cohesion_ini_bond', 'strength_max', 'strain_max', 'young_modulus_max']
+            indiv_data = []
+            with open(aim_path_and_name, "a+", encoding='UTF8', newline='') as f_w:
+                writer = csv.writer(f_w)
+                indiv_data.append(indiv_['Gene'].data[0])
+                indiv_data.append(indiv_['Gene'].data[1])
+                indiv_data.append(indiv_['Gene'].data[2])
+                indiv_data.append(indiv_['Gene'].data[3])
+                indiv_data.append(strength_max)
+                indiv_data.append(strain_max)
+                indiv_data.append(young_modulus_max)
+                if self.indiv_data_head_not_written:
+                    writer.writerow(indiv_data_head)
+                    self.indiv_data_head_not_written = False
+                writer.writerow(indiv_data)
                 f_w.close()
 
         return nextoff
