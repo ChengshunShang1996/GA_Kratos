@@ -39,7 +39,7 @@ class MachineLearning():
         print(self.df.info())
         #self.r_squared_list = []
 
-    def data_processing(self, data_min_list, data_max_list):
+    def data_processing(self, data_min_list, data_max_list, predict_index):
         
         #data processing
         self.df = self.df[self.df.strength_max != 0]   #delete 0.0 data rows
@@ -66,7 +66,7 @@ class MachineLearning():
         self.data_array = self.df.values
         
         X = Y = []
-        X, Y = self.select_prediction_parameter(4, data_min_list, data_max_list)
+        X, Y = self.select_prediction_parameter(predict_index, data_min_list, data_max_list)
 
         test_number = 25
 
@@ -160,9 +160,9 @@ class MachineLearning():
         plt.show()
         #self.r_squared_list.append(metrics.r2_score(Y_test, pre))
     
-    def ML_main(self, data_min_list, data_max_list):
+    def ML_main(self, data_min_list, data_max_list, predict_index):
 
-        X_train, Y_train, X_test, Y_test = self.data_processing(data_min_list, data_max_list)
+        X_train, Y_train, X_test, Y_test = self.data_processing(data_min_list, data_max_list, predict_index)
         xgb = self.xgboost_model_training(X_train, Y_train, X_test, Y_test)
 
         return xgb
@@ -172,9 +172,11 @@ if __name__ == "__main__":
     
     data_min_list = [5e8, 5e8, 1e6, 1e6,]
     data_max_list = [1e11, 1e11, 1e8, 1e8]
+    
+    predict_index = 4
 
     run = MachineLearning()
-    xgb = run.ML_main(data_min_list, data_max_list)
+    xgb = run.ML_main(data_min_list, data_max_list, predict_index)
 
     d = [24129130727,26010784904,13488286,1275624]
     X_test = []

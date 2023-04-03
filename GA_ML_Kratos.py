@@ -507,8 +507,10 @@ class GA:
             data_min_list = self.parameter[4]
             data_max_list = self.parameter[5]
 
+            #strength predictor
+            predict_index = 4
             run_ml = MachineLearning()
-            ML_xgb = run_ml.ML_main(data_min_list, data_max_list)
+            ML_xgb = run_ml.ML_main(data_min_list, data_max_list, predict_index)
 
             # inside GA loop
             self.pop_in = self.pop
