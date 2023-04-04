@@ -185,6 +185,11 @@ if __name__ == "__main__":
     pre = xgb.predict(X_test)
     print(pre)
 
+    predict_index = 5
+    run_5 = MachineLearning()
+    xgb_5 = run_5.ML_main(data_min_list, data_max_list, predict_index)
+    pre_5 = xgb_5.predict(X_test)
+    print(pre_5)
 
 
     

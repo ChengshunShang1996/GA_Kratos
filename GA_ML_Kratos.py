@@ -72,7 +72,7 @@ class GA:
         y = 1 / ((x1**2 + x2**2 + x3**2 + x4**2) * 1e5) #set the initial fitness a very small value
         return y
     
-    def evaluate_in(self, geneinfo, ML, run_ml):
+    def evaluate_in(self, geneinfo, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6):
         """
         fitness function using ML model
         """
@@ -81,9 +81,22 @@ class GA:
         x3 = geneinfo[2]
         x4 = geneinfo[3]
         X_test = [[x1,x2,x3,x4]]
-        X_test = run_ml.my_normalizer(X_test, self.parameter[4], self.parameter[5])
-        y = ML.predict(X_test)
-        return y
+        X_test = run_ml_4.my_normalizer(X_test, self.parameter[4], self.parameter[5])
+
+        predicted_strength = ML_xgb_4.predict(X_test)
+        predicted_starin = ML_xgb_5.predict(X_test)
+        predicted_young_modulus = ML_xgb_6.predict(X_test)
+        
+        rel_error_strength = ((predicted_strength - self.aim_strength) / self.aim_strength)**2
+        rel_error_starin   = ((predicted_starin - self.aim_strain) / self.aim_strain)**2
+        rel_error_young_modulus = ((predicted_young_modulus - self.aim_young_modulus) / self.aim_young_modulus)**2
+
+        if rel_error_strength + rel_error_young_modulus + rel_error_starin:
+            fitness = 1 / (rel_error_strength + rel_error_young_modulus + rel_error_starin)
+        else:
+            fitness = 0.0
+
+        return fitness
  
     def selectBest(self, pop):
         """
@@ -503,14 +516,24 @@ class GA:
             elapsed_time = end_time - start_time
             print('Total simulation time cost is {}'.format(elapsed_time))
 
-            # ML part
+            ############# ML part################
             data_min_list = self.parameter[4]
             data_max_list = self.parameter[5]
 
             #strength predictor
             predict_index = 4
-            run_ml = MachineLearning()
-            ML_xgb = run_ml.ML_main(data_min_list, data_max_list, predict_index)
+            run_ml_4 = MachineLearning()
+            ML_xgb_4 = run_ml_4.ML_main(data_min_list, data_max_list, predict_index)
+
+            #strength predictor
+            predict_index = 5
+            run_ml_5 = MachineLearning()
+            ML_xgb_5 = run_ml_5.ML_main(data_min_list, data_max_list, predict_index)
+
+            #strength predictor
+            predict_index = 6
+            run_ml_6 = MachineLearning()
+            ML_xgb_6 = run_ml_6.ML_main(data_min_list, data_max_list, predict_index)
 
             # inside GA loop
             self.pop_in = self.pop
@@ -535,13 +558,13 @@ class GA:
                         if random.random() < MUTPB:  # mutate an individual with probability MUTPB
                             muteoff1_in = self.mutation(crossoff1_in, self.bound)
                             muteoff2_in = self.mutation(crossoff2_in, self.bound)
-                            fit_muteoff1_in = self.evaluate_in(muteoff1_in.data, ML_xgb, run_ml)  # Evaluate the individuals
-                            fit_muteoff2_in = self.evaluate_in(muteoff2_in.data, ML_xgb, run_ml)  # Evaluate the individuals
+                            fit_muteoff1_in = self.evaluate_in(muteoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
+                            fit_muteoff2_in = self.evaluate_in(muteoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
                             nextoff_in.append({'Gene': muteoff1_in, 'fitness': fit_muteoff1_in})
                             nextoff_in.append({'Gene': muteoff2_in, 'fitness': fit_muteoff2_in})
                         else:
-                            fit_crossoff1_in = self.evaluate_in(crossoff1_in.data, ML_xgb, run_ml)  # Evaluate the individuals
-                            fit_crossoff2_in = self.evaluate_in(crossoff2_in.data, ML_xgb, run_ml)
+                            fit_crossoff1_in = self.evaluate_in(crossoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
+                            fit_crossoff2_in = self.evaluate_in(crossoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)
                             nextoff_in.append({'Gene': crossoff1_in, 'fitness': fit_crossoff1_in})
                             nextoff_in.append({'Gene': crossoff2_in, 'fitness': fit_crossoff2_in})
                     else:
