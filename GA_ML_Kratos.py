@@ -583,10 +583,8 @@ class GA:
                 if self.best_ind_in['fitness'] > self.bestindividual_in['fitness']:
                     self.bestindividual_in = self.best_ind_in
             
-            print("before pop append")
             self.pop.append(self.bestindividual_in)
             self.pop.append(self.best_ind_in)
-            print("after pop append")
             popsize += 2
 
             print("Best individual in inside GA found is {}, {}".format(self.bestindividual_in['Gene'].data,
