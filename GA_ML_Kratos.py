@@ -542,7 +542,7 @@ class GA:
 
             for g_in in range(NGEN):
   
-                #print("############### Inside Generation {} ###############".format(g_in))
+                print("############### Inside Generation {} ###############".format(g_in))
     
                 # Apply selection based on their converted fitness
                 selectpop_in = self.selection(self.pop_in, popsize)
@@ -559,13 +559,17 @@ class GA:
                         if random.random() < MUTPB:  # mutate an individual with probability MUTPB
                             muteoff1_in = self.mutation(crossoff1_in, self.bound)
                             muteoff2_in = self.mutation(crossoff2_in, self.bound)
+                            print("before eveluate_in")
                             fit_muteoff1_in = self.evaluate_in(muteoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
                             fit_muteoff2_in = self.evaluate_in(muteoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
+                            print("after eveluate_in")
                             nextoff_in.append({'Gene': muteoff1_in, 'fitness': fit_muteoff1_in})
                             nextoff_in.append({'Gene': muteoff2_in, 'fitness': fit_muteoff2_in})
                         else:
+                            print("before eveluate_in")
                             fit_crossoff1_in = self.evaluate_in(crossoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
                             fit_crossoff2_in = self.evaluate_in(crossoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)
+                            print("after eveluate_in")
                             nextoff_in.append({'Gene': crossoff1_in, 'fitness': fit_crossoff1_in})
                             nextoff_in.append({'Gene': crossoff2_in, 'fitness': fit_crossoff2_in})
                     else:
@@ -579,10 +583,11 @@ class GA:
                 if self.best_ind_in['fitness'] > self.bestindividual_in['fitness']:
                     self.bestindividual_in = self.best_ind_in
             
+            print("before pop append")
             self.pop.append(self.bestindividual_in)
             self.pop.append(self.best_ind_in)
+            print("after pop append")
             popsize += 2
-
 
             print("Best individual in inside GA found is {}, {}".format(self.bestindividual_in['Gene'].data,
                                                                         self.bestindividual_in['fitness']))
