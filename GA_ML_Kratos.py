@@ -86,7 +86,7 @@ class GA:
         predicted_strength = ML_xgb_4.predict(X_test)
         predicted_starin = ML_xgb_5.predict(X_test)
         predicted_young_modulus = ML_xgb_6.predict(X_test)
-        
+
         rel_error_strength = ((predicted_strength - self.aim_strength) / self.aim_strength)**2
         rel_error_starin   = ((predicted_starin - self.aim_strain) / self.aim_strain)**2
         rel_error_young_modulus = ((predicted_young_modulus - self.aim_young_modulus) / self.aim_young_modulus)**2
@@ -538,6 +538,7 @@ class GA:
             # inside GA loop
             self.pop_in = self.pop
             self.bestindividual_in = self.bestindividual
+            
 
             for g_in in range(NGEN):
   
@@ -573,11 +574,16 @@ class GA:
                 # The population is entirely replaced by the offspring
                 self.pop_in = nextoff_in
     
-                best_ind_in = self.selectBest(self.pop_in)
+                self.best_ind_in = self.selectBest(self.pop_in)
     
-                if best_ind_in['fitness'] > self.bestindividual_in['fitness']:
-                    self.bestindividual_in = best_ind_in
+                if self.best_ind_in['fitness'] > self.bestindividual_in['fitness']:
+                    self.bestindividual_in = self.best_ind_in
             
+            self.pop.append(self.bestindividual_in)
+            self.pop.append(self.best_ind_in)
+            popsize += 2
+
+
             print("Best individual in inside GA found is {}, {}".format(self.bestindividual_in['Gene'].data,
                                                                         self.bestindividual_in['fitness']))
             
