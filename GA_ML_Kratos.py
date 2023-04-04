@@ -559,17 +559,17 @@ class GA:
                         if random.random() < MUTPB:  # mutate an individual with probability MUTPB
                             muteoff1_in = self.mutation(crossoff1_in, self.bound)
                             muteoff2_in = self.mutation(crossoff2_in, self.bound)
-                            #fit_muteoff1_in = self.evaluate_in(muteoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
-                            #fit_muteoff2_in = self.evaluate_in(muteoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
-                            fit_muteoff1_in = 0.1
-                            fit_muteoff2_in = 0.01
+                            fit_muteoff1_in = self.evaluate_in(muteoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
+                            fit_muteoff2_in = self.evaluate_in(muteoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
+                            #fit_muteoff1_in = 0.1
+                            #fit_muteoff2_in = 0.01
                             nextoff_in.append({'Gene': muteoff1_in, 'fitness': fit_muteoff1_in})
                             nextoff_in.append({'Gene': muteoff2_in, 'fitness': fit_muteoff2_in})
                         else:
-                            #fit_crossoff1_in = self.evaluate_in(crossoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
-                            #fit_crossoff2_in = self.evaluate_in(crossoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)
-                            fit_crossoff1_in = 0.1
-                            fit_crossoff2_in = 0.01
+                            fit_crossoff1_in = self.evaluate_in(crossoff1_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)  # Evaluate the individuals
+                            fit_crossoff2_in = self.evaluate_in(crossoff2_in.data, ML_xgb_4, run_ml_4, ML_xgb_5, ML_xgb_6)
+                            #fit_crossoff1_in = 0.1
+                            #fit_crossoff2_in = 0.01
                             nextoff_in.append({'Gene': crossoff1_in, 'fitness': fit_crossoff1_in})
                             nextoff_in.append({'Gene': crossoff2_in, 'fitness': fit_crossoff2_in})
                     else:
