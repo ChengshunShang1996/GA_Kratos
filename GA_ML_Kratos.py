@@ -60,12 +60,6 @@ class GA:
         self.aim_young_modulus = parameter[7]
         self.aim_strain = parameter[8]
         self.indiv_data_head_not_written = True
-
-        log_file_name = 'running_log.txt'
-        log_output_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', log_file_name)
-        if os.path.exists(log_output_path_and_name):
-            os.remove(log_output_path_and_name)
-        self.log_export_file = open(log_output_path_and_name, 'a+')
  
     def evaluate(self, geneinfo):
         """
@@ -223,6 +217,16 @@ class GA:
         cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
         if os.path.exists(cases_run_path_and_name):
             os.remove(cases_run_path_and_name)
+
+    def clear_old_and_creat_new_log_file(self):
+        
+        log_file_name = 'running_log.txt'
+        log_output_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', log_file_name)
+        if os.path.exists(log_output_path_and_name):
+            os.remove(log_output_path_and_name)
+        log_export_file = open(log_output_path_and_name, 'a+')
+
+        return log_export_file
 
     def uniquify(self, path, path_change_marker):
         filename, extension = os.path.splitext(path)
@@ -431,6 +435,8 @@ class GA:
         main frame work of GA
         """
         popsize = self.parameter[3]
+
+        self.log_export_file = self.clear_old_and_creat_new_log_file()
  
         self.log_export_file.write("Start of evolution" + '\n')
 
