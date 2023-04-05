@@ -237,7 +237,6 @@ class GA:
     def generate_kratos_cases(self, g_count, nextoff):
 
         self.log_export_file.write('Generating kratos cases ...' + '\n')
-        self.log_export_file.flush()
         self.end_sim_file_num = 0
         # creat the cases_run.sh
         cases_run_path_and_name = os.path.join(os.getcwd(),'cases_run.sh')
@@ -304,7 +303,6 @@ class GA:
 
     def run_kratos_cases(self):
         self.log_export_file.write('Running kratos cases ...' + '\n')
-        self.log_export_file.flush()
         command_execution = 'sh cases_run.sh'
         os.system(command_execution)
     
@@ -389,7 +387,6 @@ class GA:
     def save_and_plot_best_individual_results(self, g_count, best_individual):
         
         self.log_export_file.write('Saving and ploting best individual results ...' + '\n')
-        self.log_export_file.flush()
         #save data files
         new_file_name = 'best_individual_data.txt'
         aim_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', new_file_name)
@@ -409,7 +406,6 @@ class GA:
                         + '_Sig' + sigma_max_bond + '_Coh' + cohesion_ini_bond
         to_folder_name = 'G_' + str(g_count)
         self.log_export_file.write('Coping ' + from_folder_name + '\n')
-        self.log_export_file.flush()
         #save the best individual case to results folder
         from_directory = os.path.join(os.getcwd(),'Generated_kratos_cases', from_folder_name)
         to_directory = os.path.join(os.getcwd(),'kratos_results_data', to_folder_name)
@@ -436,7 +432,6 @@ class GA:
         popsize = self.parameter[3]
  
         self.log_export_file.write("Start of evolution" + '\n')
-        self.log_export_file.flush()
 
         start_time = time.time()
  
@@ -447,7 +442,6 @@ class GA:
             self.clear_old_and_creat_new_kratos_case_folder()
             
             self.log_export_file.write("############### Generation {} ###############".format(g) + '\n')
-            self.log_export_file.flush()
  
             if g != 0:
                 # Apply selection based on their converted fitness
@@ -496,10 +490,8 @@ class GA:
                 file_num = len(glob.glob1(aim_path_and_folder,"*.txt"))
                 time.sleep(30)
                 self.log_export_file.write('-----Waiting for kratos cases -----' + '\n')
-                self.log_export_file.flush()
                 time_count += 0.5
                 self.log_export_file.write('-------Generation {} cost {} min(s)-------'.format(g, time_count) + '\n')
-                self.log_export_file.flush()
 
             #add fitness to nextoff
             nextoff = self.read_kratos_results_and_add_fitness(g, nextoff)
@@ -517,22 +509,17 @@ class GA:
                 # save the data of the best individual for post processing
                 self.save_and_plot_best_individual_results(g, self.bestindividual)
                 self.log_export_file.write('Saving best_individual' + '\n')
-                self.log_export_file.flush()
             else:
                 self.save_and_plot_best_individual_results(g, best_ind)
                 self.log_export_file.write('Saving best_ind' + '\n')
-                self.log_export_file.flush()
  
             self.log_export_file.write("Best individual found is {}, {}".format(self.bestindividual['Gene'].data,
                                                            self.bestindividual['fitness']) + '\n')
-            self.log_export_file.flush()
             self.log_export_file.write(" Max fitness of current pop: {}".format(max(fits)) + '\n')
-            self.log_export_file.flush()
 
             end_time = time.time()
             elapsed_time = end_time - start_time
             self.log_export_file.write('Total simulation time cost is {}'.format(elapsed_time) + '\n')
-            self.log_export_file.flush()
 
             ############# ML part################
             data_min_list = self.parameter[4]
@@ -561,7 +548,6 @@ class GA:
             for g_in in range(NGEN):
   
                 self.log_export_file.write("############### Inside Generation {} ###############".format(g_in) + '\n')
-                self.log_export_file.flush()
     
                 # Apply selection based on their converted fitness
                 selectpop_in = self.selection(self.pop_in, popsize)
@@ -608,11 +594,9 @@ class GA:
 
             self.log_export_file.write("Best individual in inside GA found is {}, {}".format(self.bestindividual_in['Gene'].data,
                                                                         self.bestindividual_in['fitness']) + '\n')
-            self.log_export_file.flush()
             
         self.final_clear_kratos_case_and_data_folder()
         self.log_export_file.write("------ End of (successful) evolution ------" + '\n')
-        self.log_export_file.flush()
         self.log_export_file.close()
  
 if __name__ == "__main__":
