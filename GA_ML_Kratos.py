@@ -61,7 +61,8 @@ class GA:
         self.aim_strain = parameter[8]
         self.indiv_data_head_not_written = True
 
-        log_output_path_and_name = os.path.join(os.getcwd(),'kratos_results_data','running_log.txt')
+        log_file_name = 'running_log.txt'
+        log_output_path_and_name = os.path.join(os.getcwd(),'kratos_results_data', log_file_name)
         if os.path.exists(log_output_path_and_name):
             os.remove(log_output_path_and_name)
         self.log_export_file = open(log_output_path_and_name, 'a+')
@@ -600,7 +601,7 @@ class GA:
         self.log_export_file.close()
  
 if __name__ == "__main__":
-    CXPB, MUTPB, NGEN, popsize = 0.8, 0.2, 1000, 200  # popsize must be even number
+    CXPB, MUTPB, NGEN, popsize = 0.8, 0.2, 1000, 50  # popsize must be even number
     aim_strength, aim_young_modulus = 4.323e7, 5.54e9
     aim_strain = 1.01265
  
