@@ -225,7 +225,6 @@ class GA:
         if os.path.exists(log_output_path_and_name):
             os.remove(log_output_path_and_name)
         log_export_file = open(log_output_path_and_name, 'a+')
-
         return log_export_file
 
     def uniquify(self, path, path_change_marker):
@@ -439,6 +438,7 @@ class GA:
         self.log_export_file = self.clear_old_and_creat_new_log_file()
  
         self.log_export_file.write("Start of evolution" + '\n')
+        self.log_export_file.flush()
 
         start_time = time.time()
  
@@ -489,6 +489,8 @@ class GA:
 
             self.run_kratos_cases()
 
+            self.log_export_file.flush()
+
             #check whether all the kratos cases in this generation finished
             file_num = 0
             time_count = 0
@@ -499,6 +501,7 @@ class GA:
                 self.log_export_file.write('-----Waiting for kratos cases -----' + '\n')
                 time_count += 0.5
                 self.log_export_file.write('-------Generation {} cost {} min(s)-------'.format(g, time_count) + '\n')
+                self.log_export_file.flush()
 
             #add fitness to nextoff
             nextoff = self.read_kratos_results_and_add_fitness(g, nextoff)
@@ -527,6 +530,7 @@ class GA:
             end_time = time.time()
             elapsed_time = end_time - start_time
             self.log_export_file.write('Total simulation time cost is {}'.format(elapsed_time) + '\n')
+            self.log_export_file.flush()
 
             ############# ML part################
             data_min_list = self.parameter[4]
@@ -555,6 +559,7 @@ class GA:
             for g_in in range(NGEN):
   
                 self.log_export_file.write("############### Inside Generation {} ###############".format(g_in) + '\n')
+                self.log_export_file.flush()
     
                 # Apply selection based on their converted fitness
                 selectpop_in = self.selection(self.pop_in, popsize)
@@ -601,9 +606,11 @@ class GA:
 
             self.log_export_file.write("Best individual in inside GA found is {}, {}".format(self.bestindividual_in['Gene'].data,
                                                                         self.bestindividual_in['fitness']) + '\n')
+            self.log_export_file.flush()
             
         self.final_clear_kratos_case_and_data_folder()
         self.log_export_file.write("------ End of (successful) evolution ------" + '\n')
+        self.log_export_file.flush()
         self.log_export_file.close()
  
 if __name__ == "__main__":
