@@ -483,8 +483,8 @@ class GA:
                         nextoff.extend(offspring)
                 
                 #the predicted best individual by inside GA are added to the population
-                self.pop.append(self.bestindividual_in)
-                self.pop.append(self.best_ind_in)
+                nextoff.append(self.bestindividual_in)
+                nextoff.append(self.best_ind_in)
                 popsize += 2
                 
             else:
