@@ -564,8 +564,8 @@ class GA:
 
             for g_in in range(NGEN):
   
-                self.log_export_file.write("############### Inside Generation {} ###############".format(g_in) + '\n')
-                self.log_export_file.flush()
+                #self.log_export_file.write("############### Inside Generation {} ###############".format(g_in) + '\n')
+                #self.log_export_file.flush()
     
                 # Apply selection based on their converted fitness
                 selectpop_in = self.selection(self.pop_in, popsize)
