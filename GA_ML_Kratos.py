@@ -483,8 +483,12 @@ class GA:
                         nextoff.extend(offspring)
                 
                 #the predicted best individual by inside GA are added to the population
-                nextoff.append(self.bestindividual_in)
-                nextoff.append(self.best_ind_in)
+                newoff1_add = Gene(data=[])  # offspring1 produced by cross operation
+                newoff2_add = Gene(data=[])  # offspring2 produced by cross operation
+                newoff1_add.data = self.bestindividual_in['Gene'].data
+                newoff2_add.data = self.best_ind_in['Gene'].data
+                nextoff.append({'Gene': newoff1_add})
+                nextoff.append({'Gene': newoff2_add})
                 popsize += 2
                 
             else:
