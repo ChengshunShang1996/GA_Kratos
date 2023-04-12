@@ -347,12 +347,23 @@ class GA:
             aim_path_and_name = os.path.join(os.getcwd(),'Generated_kratos_cases', aim_folder_name, 'G-Triaxial_Graphs', 'G-Triaxial_graph_young.grf')
 
             if os.path.getsize(aim_path_and_name) != 0:
+                strain_data_list = []
                 young_data_list = []
                 with open(aim_path_and_name, 'r') as young_data:
                     for line in young_data:
                         values = [float(s) for s in line.split()]
+                        strain_data_list.append(values[0])
                         young_data_list.append(values[1]) 
-                young_modulus_max = max(young_data_list)
+                if max(strain_data_list) > 0.6:
+                    young_cnt = 0
+                    young_select_sum = 0.0
+                    for strain_data in strain_data_list:
+                        if strain_data > 0.4 and strain_data < 0.6:
+                            young_select_sum += young_data_list[strain_data_list.index(strain_data)]
+                            young_cnt += 1
+                    young_modulus_max = young_select_sum / young_cnt
+                else:
+                    young_modulus_max = max(young_data_list)
                 rel_error_young_modulus = ((young_modulus_max - self.aim_young_modulus) / self.aim_young_modulus)**2
             else:
                 young_modulus_max = 0.0
